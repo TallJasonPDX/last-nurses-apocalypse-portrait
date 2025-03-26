@@ -32,13 +32,22 @@ const examples = [
   },
 ];
 
-// New landscape group example
-const groupExample = {
-  id: "group1",
-  original: "https://thelastnurses.com/images/group-original.jpg",
-  processed: "https://thelastnurses.com/images/group-processed.jpg",
-  title: "Medical Team"
-};
+// Group examples array
+const groupExamples = [
+  {
+    id: "group1",
+    original: "https://thelastnurses.com/images/group-original.jpg",
+    processed: "https://thelastnurses.com/images/group-processed.jpg",
+    title: "Medical Team"
+  },
+  // You can add more group examples here as needed
+  {
+    id: "group2",
+    original: "https://thelastnurses.com/images/group-original2.jpg",
+    processed: "https://thelastnurses.com/images/group-processed2.jpg",
+    title: "Hospital Staff"
+  }
+];
 
 export default function Examples() {
   const isMobile = useIsMobile();
@@ -92,35 +101,38 @@ export default function Examples() {
             ))}
           </div>
           
-          {/* Group example - full width landscape layout */}
-          <div className="mb-16">
-            <div className="glass rounded-lg overflow-hidden p-4">
-              <h3 className="text-white text-xl mb-4 text-center">{groupExample.title}</h3>
-              
-              <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
-                <div className="space-y-2">
-                  <div className="w-full rounded-md overflow-hidden">
-                    <img 
-                      src={groupExample.original} 
-                      alt={`Original ${groupExample.title}`}
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                  <p className="text-center text-white/70 text-sm">Before</p>
-                </div>
+          {/* Group examples - full width landscape layout */}
+          <div className="mb-16 space-y-12">
+            <h2 className="text-white text-2xl mb-6 text-center">Group Transformations</h2>
+            {groupExamples.map((groupExample) => (
+              <div key={groupExample.id} className="glass rounded-lg overflow-hidden p-4">
+                <h3 className="text-white text-xl mb-4 text-center">{groupExample.title}</h3>
                 
-                <div className="space-y-2">
-                  <div className="w-full rounded-md overflow-hidden">
-                    <img 
-                      src={groupExample.processed} 
-                      alt={`Transformed ${groupExample.title}`}
-                      className="w-full h-auto object-contain"
-                    />
+                <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
+                  <div className="space-y-2">
+                    <div className="w-full rounded-md overflow-hidden">
+                      <img 
+                        src={groupExample.original} 
+                        alt={`Original ${groupExample.title}`}
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                    <p className="text-center text-white/70 text-sm">Before</p>
                   </div>
-                  <p className="text-center text-white/70 text-sm">After</p>
+                  
+                  <div className="space-y-2">
+                    <div className="w-full rounded-md overflow-hidden">
+                      <img 
+                        src={groupExample.processed} 
+                        alt={`Transformed ${groupExample.title}`}
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                    <p className="text-center text-white/70 text-sm">After</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
           
           <div className="text-center">
