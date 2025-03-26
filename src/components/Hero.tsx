@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
-  "The Last Nurses to conquer a pandemic without PPE",
   "The Last Nurses to protect patients in an understaffed unit",
   "The Last Nurses to defend themselves against zombie (patient) attacks",
   "The Last Nurses to provide healthcare in a world turning against science",
@@ -15,10 +14,11 @@ export default function Hero() {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
   const typingSpeed = useRef(60); // milliseconds per character
   const deletingSpeed = useRef(30); // milliseconds per character
   const delayAfterTyping = useRef(2000); // pause after typing completes
-  const delayAfterDeleting = useRef(500); // pause after deleting completes
+  const delayAfterDeleting = useRef(1000); // pause after deleting completes
 
   useEffect(() => {
     if (isTyping) {
@@ -48,8 +48,12 @@ export default function Hero() {
         setIsDeleting(false);
         const nextIndex = (currentMessageIndex + 1) % messages.length;
         
+        // Briefly hide the cursor during the pause
+        setShowCursor(false);
+        
         const timeout = setTimeout(() => {
           setCurrentMessageIndex(nextIndex);
+          setShowCursor(true);
           setIsTyping(true);
         }, delayAfterDeleting.current);
         return () => clearTimeout(timeout);
@@ -73,7 +77,7 @@ export default function Hero() {
         />
         
         <div className="h-16 sm:h-14 flex items-center justify-center mb-6">
-          <div className="inline-block terminal-text typing-cursor">
+          <div className={`inline-block terminal-text ${showCursor ? "typing-cursor" : ""}`}>
             &gt; {displayText}
           </div>
         </div>
