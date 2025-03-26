@@ -87,8 +87,10 @@ export default function ImageUploaderContainer() {
           if (!response.job_id) return;
           
           const statusResponse = await API.getJobStatus(response.job_id);
+          console.log("Status response:", statusResponse);
           
-          if (statusResponse.status === "COMPLETED" && statusResponse.output_image) {
+          // Check for both 'COMPLETED' and 'completed' status values
+          if ((statusResponse.status === "COMPLETED" || statusResponse.status === "completed") && statusResponse.output_image) {
             // Job is complete
             setProcessedImage(statusResponse.output_image);
             setIsProcessing(false);
@@ -101,7 +103,7 @@ export default function ImageUploaderContainer() {
             }
             
             toast.success("Your image has been transformed!");
-          } else if (statusResponse.status === "FAILED") {
+          } else if (statusResponse.status === "FAILED" || statusResponse.status === "failed") {
             // Job failed
             setIsProcessing(false);
             toast.error(statusResponse.error || "Failed to process image");
@@ -124,7 +126,7 @@ export default function ImageUploaderContainer() {
             pollInterval.current = null;
           }
         }
-      }, 5000); // Poll every 5 seconds instead of 10
+      }, 5000); // Poll every 5 seconds
       
     } catch (error) {
       console.error("Error processing image:", error);

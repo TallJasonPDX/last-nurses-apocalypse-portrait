@@ -8,7 +8,7 @@ interface ProcessImageRequest {
 
 interface JobStatusResponse {
   job_id: string;
-  status: string;
+  status: string; // Can be "COMPLETED", "completed", "FAILED", "failed", etc.
   output_image?: string;
   error?: string;
   message?: string;
