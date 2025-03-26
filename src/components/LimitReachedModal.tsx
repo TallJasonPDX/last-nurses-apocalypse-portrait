@@ -1,11 +1,18 @@
 
 import { X, Instagram } from "lucide-react";
+import { API } from "@/services/api";
 
 interface LimitReachedModalProps {
   onClose: () => void;
 }
 
 export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
+  const handleInstagramLogin = () => {
+    API.connectInstagram();
+    // We'll close the modal since the Instagram auth will open in a popup
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
       <div className="relative glass rounded-lg max-w-md w-full p-6 animate-scale-in">
@@ -47,15 +54,13 @@ export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
             </p>
           </div>
           
-          <a
-            href="https://www.instagram.com/replace_rn/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={handleInstagramLogin}
             className="block w-full px-4 py-3 bg-gradient-to-r from-[#405DE6] via-[#5B51D8] to-[#833AB4] text-white rounded-md transition-transform hover:scale-105 mb-3 flex items-center justify-center space-x-2"
           >
             <Instagram size={20} />
             <span>Follow on Instagram</span>
-          </a>
+          </button>
           
           <button
             onClick={onClose}
