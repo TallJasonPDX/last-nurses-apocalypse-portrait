@@ -62,7 +62,7 @@ export default function Hero() {
   }, [displayText, isTyping, isDeleting, currentMessageIndex]);
 
   return (
-    <section className="relative min-h-[50vh] sm:min-h-[45vh] flex flex-col items-center justify-center overflow-hidden px-4 py-2 sm:py-3">
+    <section className="relative min-h-[50vh] sm:min-h-[45vh] flex flex-col items-center justify-center overflow-hidden px-4 py-1 sm:py-2">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-apocalypse-green/5 rounded-full filter blur-3xl"></div>
