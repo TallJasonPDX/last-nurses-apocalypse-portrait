@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
+import { API } from "@/services/api";
 
 // Mock gallery data
 const mockGallery = [
@@ -40,6 +41,10 @@ export default function Gallery() {
       setGallery([]);
     }
   }, [isLoggedIn]);
+
+  const handleInstagramLogin = () => {
+    API.connectInstagram();
+  };
 
   // Format date
   const formatDate = (date: Date) => {
@@ -119,6 +124,7 @@ export default function Gallery() {
                 Please sign in with Instagram to view your personal gallery.
               </p>
               <button 
+                onClick={handleInstagramLogin}
                 className="px-4 py-2 bg-gradient-to-r from-[#405DE6] via-[#5B51D8] to-[#833AB4] text-white rounded-md transition-transform hover:scale-105"
               >
                 Connect Instagram

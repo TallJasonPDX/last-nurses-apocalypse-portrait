@@ -48,6 +48,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         // If Instagram connected, give more free generations
         if (storedInstagramConnected === "true") {
           setTotalGenerations(10);
+        } else {
+          setTotalGenerations(3);
         }
       }
     }
@@ -82,15 +84,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const newValue = remainingGenerations - 1;
     setRemainingGenerations(newValue);
     localStorage.setItem("remaining_generations", newValue.toString());
-  };
-
-  const connectInstagram = () => {
-    localStorage.setItem("instagram_connected", "true");
-    localStorage.setItem("remaining_generations", "10");
-    
-    setInstagramConnected(true);
-    setRemainingGenerations(10);
-    setTotalGenerations(10);
   };
 
   return (

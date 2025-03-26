@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { API } from "@/services/api";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,6 +23,10 @@ export default function Header() {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
+
+  const handleInstagramLogin = () => {
+    API.connectInstagram();
+  };
 
   return (
     <header 
@@ -92,7 +98,7 @@ export default function Header() {
               </div>
             ) : (
               <button 
-                onClick={() => {}} // Login form will be implemented later
+                onClick={handleInstagramLogin}
                 className="text-xs px-4 py-2 bg-apocalypse-green/80 hover:bg-apocalypse-green text-black rounded-md transition-colors"
               >
                 CONNECT INSTAGRAM
@@ -162,7 +168,7 @@ export default function Header() {
               </div>
             ) : (
               <button 
-                onClick={() => {}} // Login form will be implemented later
+                onClick={handleInstagramLogin}
                 className="text-xs w-full px-4 py-2 bg-apocalypse-green/80 hover:bg-apocalypse-green text-black rounded-md transition-colors"
               >
                 CONNECT INSTAGRAM
