@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 const messages = [
   "The Last Nurses to conquer a pandemic without PPE",
@@ -10,16 +10,15 @@ const messages = [
 ];
 
 export default function Hero() {
+  const [messageLines, setMessageLines] = useState([""]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   
   const typingSpeed = 60; // milliseconds per character
-  const deletingSpeed = 30; // milliseconds per character
-  const delayAfterTyping = 2000; // pause after typing completes
-  const delayAfterDeleting = 1000; // pause after deleting completes
+  const messageDisplayTime = 2000; // how long to show completed message
+  const cursorBlinkTime = 1000; // cursor blink time before new message
 
   useEffect(() => {
     let timeout;
@@ -31,38 +30,29 @@ export default function Hero() {
           setDisplayText(messages[currentMessageIndex].substring(0, displayText.length + 1));
         }, typingSpeed);
       } else {
-        // Finished typing, pause before deleting
+        // Finished typing, pause before showing new line
         timeout = setTimeout(() => {
-          setIsDeleting(true);
+          // Add current line to message history
+          setMessageLines(prev => [...prev, `> ${displayText}`]);
+          // Clear current typing display
+          setDisplayText("");
           setIsTyping(false);
-        }, delayAfterTyping);
-      }
-    } else if (isDeleting) {
-      if (displayText.length > 0) {
-        // Still deleting the current message
-        timeout = setTimeout(() => {
-          setDisplayText(displayText.substring(0, displayText.length - 1));
-        }, deletingSpeed);
-      } else {
-        // Finished deleting, prepare for next message
-        setIsDeleting(false);
-        
-        // Calculate next message index
-        const nextIndex = (currentMessageIndex + 1) % messages.length;
-        
-        // Briefly hide the cursor during the pause
-        setShowCursor(false);
-        
-        timeout = setTimeout(() => {
-          setCurrentMessageIndex(nextIndex);
+          // Show blinking cursor on empty line
           setShowCursor(true);
-          setIsTyping(true);
-        }, delayAfterDeleting);
+        }, messageDisplayTime);
       }
+    } else {
+      // Show blinking cursor for a moment, then start typing next message
+      timeout = setTimeout(() => {
+        // Move to next message
+        const nextIndex = (currentMessageIndex + 1) % messages.length;
+        setCurrentMessageIndex(nextIndex);
+        setIsTyping(true);
+      }, cursorBlinkTime);
     }
 
     return () => clearTimeout(timeout);
-  }, [displayText, isTyping, isDeleting, currentMessageIndex]);
+  }, [displayText, isTyping, currentMessageIndex]);
 
   return (
     <section className="relative min-h-[50vh] sm:min-h-[45vh] flex flex-col items-center justify-center overflow-hidden px-4 py-1 sm:py-2">
@@ -72,15 +62,23 @@ export default function Hero() {
         <div className="absolute bottom-1/4 right-1/3 w-72 h-72 bg-apocalypse-rust/5 rounded-full filter blur-3xl"></div>
       </div>
       
-      <div className="relative z-10 max-w-4xl mx-auto text-center">
+      <div className="relative z-10 max-w-4xl mx-auto">
         <img 
           src="/lovable-uploads/59977c5a-cfc6-45ed-b037-b1fff5e1f247.png" 
           alt="The Last Nurses" 
           className="w-[94%] sm:w-[400px] mx-auto mb-2" 
         />
         
-        <div className="h-12 sm:h-14 flex items-center justify-center mb-4">
-          <div className={`inline-block ${showCursor ? "typing-cursor" : ""}`} style={{ color: "#4fbc77", fontFamily: "'JetBrains Mono', monospace" }}>
+        <div className="font-mono text-left text-apocalypse-green mb-4 max-w-2xl mx-auto h-[120px] overflow-hidden">
+          {/* Previous messages (up to 3) */}
+          <div className="terminal-history">
+            {messageLines.slice(-3).map((line, i) => (
+              <div key={i} className="terminal-line">{line}</div>
+            ))}
+          </div>
+          
+          {/* Current typing line */}
+          <div className={`terminal-line ${showCursor ? "typing-cursor" : ""}`}>
             &gt; {displayText}
           </div>
         </div>
