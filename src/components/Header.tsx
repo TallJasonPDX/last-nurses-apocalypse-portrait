@@ -41,7 +41,7 @@ export default function Header() {
             className="flex items-center"
           >
             <img 
-              src="/lovable-uploads/c04465fc-89dc-4ac0-8b37-8ece4a7ca4aa.png" 
+              src="/images/top-logo-horiz.png" 
               alt="The Last Nurses" 
               className="h-10" 
             />
