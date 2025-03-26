@@ -147,8 +147,8 @@ export default function ImageUploaderContainer() {
       <div className="text-center mb-6">
         <h2 className="text-white mb-3">Transform Your Image</h2>
         <p className="text-white/70 max-w-2xl mx-auto">
-          Upload an image of yourself, a group photo (up to 3 people), or hospital scene 
-          to transform it into a post-apocalyptic masterpiece.
+          Upload an image of yourself, a group photo (up to 3 people), or your hospital (inside or out) 
+          to transform it into a post-apocalyptic masterpiece.  Tips: Use clear photos and avoid small faces (including in the background).  Allow room around each person so we can transform the environment as well.
         </p>
       </div>
       
@@ -177,7 +177,6 @@ export default function ImageUploaderContainer() {
       <div className="text-center text-sm text-white/50">
         <p>
           By uploading an image, you agree to our Terms of Service and Privacy Policy. 
-          Images must be appropriate and cannot contain nudity or offensive content.
         </p>
       </div>
       
