@@ -15,9 +15,9 @@ export default function Hero() {
   const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   
-  const typingSpeed = 60; // milliseconds per character
+  const typingSpeed = 70; // milliseconds per character
   const messageDisplayTime = 3000; // how long to show completed message
-  const cursorBlinkTime = 1000; // cursor blink time before new message
+  const cursorBlinkTime = 2000; // cursor blink time before new message
 
   useEffect(() => {
     let timeout;
