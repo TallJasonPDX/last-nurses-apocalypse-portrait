@@ -6,6 +6,7 @@ export default function DataRequests() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <div className="h-[200px]"></div>
       <main className="flex-grow py-20">
         <div className="container max-w-3xl mx-auto px-4">
           <div className="prose prose-invert mx-auto">
