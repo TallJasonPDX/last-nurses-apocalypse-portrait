@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -10,7 +9,6 @@ export default function Header() {
   const { isLoggedIn, username, remainingGenerations, totalGenerations, logout } = useUser();
   const location = useLocation();
   
-  // Change header style on scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -20,7 +18,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
@@ -37,10 +34,13 @@ export default function Header() {
             to="/" 
             className="flex items-center"
           >
-            <img src="/lovable-uploads/960d9792-8d24-4144-9866-3d45b12c670f.png" alt="The Last Nurses" className="h-10" />
+            <img 
+              src="/lovable-uploads/c04465fc-89dc-4ac0-8b37-8ece4a7ca4aa.png" 
+              alt="The Last Nurses" 
+              className="h-10" 
+            />
           </Link>
           
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link 
               to="/" 
@@ -100,7 +100,6 @@ export default function Header() {
             )}
           </nav>
           
-          {/* Mobile Menu Toggle */}
           <button 
             className="md:hidden text-white" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -110,7 +109,6 @@ export default function Header() {
         </div>
       </div>
       
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden bg-apocalypse-darkgray/95 backdrop-blur-md border-t border-white/10 animate-slide-down">
           <nav className="container mx-auto px-4 py-6 flex flex-col space-y-6">
