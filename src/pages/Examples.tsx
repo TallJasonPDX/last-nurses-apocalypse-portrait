@@ -31,6 +31,14 @@ const examples = [
   },
 ];
 
+// New landscape group example
+const groupExample = {
+  id: "group1",
+  original: "https://thelastnurses.com/images/group-original.jpg",
+  processed: "https://thelastnurses.com/images/group-processed.jpg",
+  title: "Medical Team"
+};
+
 export default function Examples() {
   useEffect(() => {
     // Set the document title with the Examples page suffix
@@ -79,6 +87,37 @@ export default function Examples() {
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Group example - full width landscape layout */}
+          <div className="mb-16">
+            <div className="glass rounded-lg overflow-hidden p-4">
+              <h3 className="text-white text-xl mb-4 text-center">{groupExample.title}</h3>
+              
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <div className="aspect-[16/9] overflow-hidden rounded-md">
+                    <img 
+                      src={groupExample.original} 
+                      alt={`Original ${groupExample.title}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-center text-white/70 text-sm">Before</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="aspect-[16/9] overflow-hidden rounded-md">
+                    <img 
+                      src={groupExample.processed} 
+                      alt={`Transformed ${groupExample.title}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-center text-white/70 text-sm">After</p>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div className="text-center">
