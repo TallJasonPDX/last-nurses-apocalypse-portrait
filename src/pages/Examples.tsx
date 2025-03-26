@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -31,6 +32,11 @@ const examples = [
 ];
 
 export default function Examples() {
+  useEffect(() => {
+    // Set the document title with the Examples page suffix
+    document.title = "The Last Nurses - A Replace_RN application - Examples";
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

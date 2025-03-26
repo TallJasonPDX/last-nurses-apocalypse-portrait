@@ -9,6 +9,9 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // Set the document title with the 404 page suffix
+    document.title = "The Last Nurses - A Replace_RN application - 404";
+    
     console.error(
       "404 Error: User attempted to access non-existent route:",
       location.pathname
@@ -37,6 +40,6 @@ const NotFound = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default NotFound;

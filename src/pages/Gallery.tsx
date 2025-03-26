@@ -14,6 +14,11 @@ interface GalleryImage {
 }
 
 export default function Gallery() {
+  useEffect(() => {
+    // Set the document title with the Gallery page suffix
+    document.title = "The Last Nurses - A Replace_RN application - Gallery";
+  }, []);
+
   const { isLoggedIn } = useUser();
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);

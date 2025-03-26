@@ -1,9 +1,15 @@
 
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Instagram, Send } from "lucide-react";
 
 export default function About() {
+  useEffect(() => {
+    // Set the document title with the About page suffix
+    document.title = "The Last Nurses - A Replace_RN application - About";
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
