@@ -7,27 +7,27 @@ import Footer from "@/components/Footer";
 const examples = [
   {
     id: "ex1",
-    original: "https://placehold.co/600x800/333/ffffff?text=Before+1",
-    processed: "https://placehold.co/600x800/44734e/ffffff?text=After+1",
-    title: "Lone Survivor Nurse"
+    original: "https://thelastnurse.com/public/meredith2.jpg",
+    processed: "https://thelastnurse.com/public/day2-1.png",
+    title: "Grey's Anatomy"
   },
   {
     id: "ex2",
-    original: "https://placehold.co/600x800/333/ffffff?text=Before+2",
-    processed: "https://placehold.co/600x800/44734e/ffffff?text=After+2",
-    title: "Team of Healers"
+    original: "https://thelastnurse.com/public/res1.jpg",
+    processed: "https://thelastnurse.com/public/day1-2.png",
+    title: "The Resident"
   },
   {
     id: "ex3",
-    original: "https://placehold.co/600x800/333/ffffff?text=Before+3",
-    processed: "https://placehold.co/600x800/44734e/ffffff?text=After+3",
-    title: "Hospital Scene"
+    original: "https://thelastnurse.com/public/gd2.jpg",
+    processed: "https://thelastnurse.com/public/day4-1.png",
+    title: "The Good Doctor"
   },
   {
     id: "ex4",
-    original: "https://placehold.co/600x800/333/ffffff?text=Before+4",
-    processed: "https://placehold.co/600x800/44734e/ffffff?text=After+4",
-    title: "Nurse on Duty"
+    original: "https://thelastnurse.com/public/std5.jpg",
+    processed: "https://thelastnurse.com/public/day3-1.png",
+    title: "St. Denis"
   },
 ];
 
