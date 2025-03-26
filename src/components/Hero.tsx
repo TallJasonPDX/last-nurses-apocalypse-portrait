@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
@@ -73,7 +74,7 @@ export default function Hero() {
         <img 
           src="/lovable-uploads/59977c5a-cfc6-45ed-b037-b1fff5e1f247.png" 
           alt="The Last Nurses" 
-          className="w-[60%] sm:w-[400px] mx-auto mb-2" 
+          className="w-[80%] sm:w-[400px] mx-auto mb-2" 
         />
         
         <div className="h-12 sm:h-14 flex items-center justify-center mb-4">
