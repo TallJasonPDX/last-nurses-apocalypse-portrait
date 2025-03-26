@@ -124,7 +124,7 @@ export default function ImageUploaderContainer() {
             pollInterval.current = null;
           }
         }
-      }, 10000); // Poll every 10 seconds
+      }, 5000); // Poll every 5 seconds instead of 10
       
     } catch (error) {
       console.error("Error processing image:", error);
@@ -184,6 +184,14 @@ export default function ImageUploaderContainer() {
       {showLimitModal && (
         <LimitReachedModal onClose={() => setShowLimitModal(false)} />
       )}
+      
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileChange}
+        accept="image/*"
+      />
     </div>
   );
 }

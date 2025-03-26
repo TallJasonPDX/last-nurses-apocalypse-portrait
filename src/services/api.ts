@@ -27,7 +27,7 @@ interface AuthResponse {
 
 // API base URL for backend
 const API_BASE_URL = "https://sdbe.replit.app"; 
-const ENDPOINT_ID = "ep-post-apocalyptic-nurse-01"; // Placeholder endpoint ID
+const ENDPOINT_ID = "ep-post-apocalyptic-nurse-01"; // Production endpoint ID
 
 export const API = {
   // Instagram authentication
@@ -103,70 +103,110 @@ export const API = {
   
   processImage: async (image: string): Promise<JobStatusResponse> => {
     try {
-      // For now we'll mock the API call
       const data: ProcessImageRequest = {
-        workflow_name: "lastnurses_api", // As specified in requirements
+        workflow_name: "lastnurses_api", // Using the correct workflow name
         image: image,
         endpointId: ENDPOINT_ID,
         waitForResponse: false
       };
       
-      // In a real implementation, this would be:
-      // const response = await fetch(`${API_BASE_URL}/api/images/process-image`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data)
-      // });
-      // const result = await response.json();
-      
-      // Mock response for demonstration
-      console.log("Processing image...", data);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Return mocked job ID
-      return {
-        job_id: "mock-job-" + Date.now(),
-        status: "PROCESSING",
-        message: "Image processing started"
+      const token = localStorage.getItem("auth_token");
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
       };
+      
+      // Add auth token if available
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Make the actual API call to the backend
+      const response = await fetch(`${API_BASE_URL}/api/images/process-image`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to process image");
+      }
+      
+      const result = await response.json();
+      console.log("Image processing started:", result);
+      
+      return result;
     } catch (error) {
-      toast.error("Failed to process image. Please try again.");
+      console.error("Image processing error:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to process image. Please try again.");
       throw error;
     }
   },
   
   getJobStatus: async (jobId: string): Promise<JobStatusResponse> => {
     try {
-      // In real implementation, this would be:
-      // const response = await fetch(`${API_BASE_URL}/api/images/job-status/${jobId}?endpointId=${ENDPOINT_ID}`);
-      // const result = await response.json();
+      const token = localStorage.getItem("auth_token");
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
       
-      console.log("Checking job status for", jobId);
-      
-      // For demo purposes, randomly determine if job is done
-      const isComplete = Math.random() > 0.7;
-      
-      if (isComplete) {
-        // Return mock success response
-        return {
-          job_id: jobId,
-          status: "COMPLETED",
-          output_image: "https://placehold.co/800x800/44734e/ffffff?text=Processed+Image",
-          message: "Image processing completed"
-        };
+      // Add auth token if available
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
       
-      // Return still processing
-      return {
-        job_id: jobId,
-        status: "PROCESSING",
-        message: "Image still processing"
-      };
+      const response = await fetch(`${API_BASE_URL}/api/images/job-status/${jobId}?endpointId=${ENDPOINT_ID}`, {
+        method: 'GET',
+        headers: headers
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to check job status");
+      }
+      
+      const result = await response.json();
+      console.log("Job status:", result);
+      
+      return result;
     } catch (error) {
-      toast.error("Failed to check job status. Please try again.");
+      console.error("Error checking job status:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to check job status. Please try again.");
       throw error;
+    }
+  },
+  
+  // Add getUserImages endpoint to fetch user's generated images for the gallery
+  getUserImages: async (): Promise<any[]> => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      
+      if (!token) {
+        // Return empty array if not authenticated
+        return [];
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/api/images/user-images`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch images");
+      }
+      
+      const result = await response.json();
+      console.log("User images fetched:", result);
+      
+      return result.images || [];
+    } catch (error) {
+      console.error("Error fetching user images:", error);
+      toast.error("Failed to load your gallery. Please try again later.");
+      return [];
     }
   }
 };

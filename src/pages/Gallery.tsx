@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -5,40 +6,46 @@ import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
 
-// Mock gallery data
-const mockGallery = [
-  {
-    id: "img1",
-    original: "https://placehold.co/600x400/333/ffffff?text=Original+1",
-    processed: "https://placehold.co/600x400/44734e/ffffff?text=Processed+1",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2) // 2 days ago
-  },
-  {
-    id: "img2",
-    original: "https://placehold.co/600x400/333/ffffff?text=Original+2",
-    processed: "https://placehold.co/600x400/44734e/ffffff?text=Processed+2",
-    date: new Date(Date.now() - 1000 * 60 * 60 * 12) // 12 hours ago
-  },
-  {
-    id: "img3",
-    original: "https://placehold.co/600x400/333/ffffff?text=Original+3",
-    processed: "https://placehold.co/600x400/44734e/ffffff?text=Processed+3",
-    date: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
-  }
-];
+interface GalleryImage {
+  id: string;
+  original: string;
+  processed: string;
+  date: Date;
+}
 
 export default function Gallery() {
   const { isLoggedIn } = useUser();
-  const [gallery, setGallery] = useState<typeof mockGallery>([]);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
-    // In a real app, we'd fetch the gallery from the API
-    // For now, use mock data if logged in
-    if (isLoggedIn) {
-      setGallery(mockGallery);
-    } else {
-      setGallery([]);
-    }
+    const fetchGallery = async () => {
+      if (!isLoggedIn) {
+        setGallery([]);
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        const images = await API.getUserImages();
+        
+        // Transform API response to our gallery format
+        const galleryImages = images.map(img => ({
+          id: img.id || img._id,
+          original: img.original_image || img.originalImage,
+          processed: img.processed_image || img.processedImage,
+          date: new Date(img.created_at || img.createdAt || Date.now())
+        }));
+        
+        setGallery(galleryImages);
+      } catch (error) {
+        console.error("Failed to fetch gallery:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchGallery();
   }, [isLoggedIn]);
 
   const handleInstagramLogin = () => {
@@ -76,7 +83,12 @@ export default function Gallery() {
           </div>
           
           {isLoggedIn ? (
-            gallery.length > 0 ? (
+            isLoading ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 border-t-4 border-apocalypse-terminal border-solid rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-white/70">Loading your transformations...</p>
+              </div>
+            ) : gallery.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((item) => (
                   <div key={item.id} className="glass rounded-lg overflow-hidden transition-transform hover:scale-105">
