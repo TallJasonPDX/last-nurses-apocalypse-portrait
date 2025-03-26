@@ -44,8 +44,8 @@ export const API = {
         throw new Error('Failed to get Instagram authorization URL');
       }
       
-      const authData = await authUrlResponse.json();
-      const instagramAuthUrl = authData.auth_url || authData.url;
+      const responseData = await authUrlResponse.json();
+      const instagramAuthUrl = responseData.auth_url || responseData.url;
       
       if (!instagramAuthUrl) {
         throw new Error('No authorization URL returned from server');
@@ -129,24 +129,24 @@ export const API = {
       });
       
       // Wait for authentication to complete
-      const authData = await authPromise;
+      const authResult = await authPromise;
       
       // Store auth info in localStorage
-      if (authData.token) {
-        localStorage.setItem("auth_token", authData.token);
+      if (authResult.token) {
+        localStorage.setItem("auth_token", authResult.token);
       }
-      if (authData.username) {
-        localStorage.setItem("username", authData.username);
+      if (authResult.username) {
+        localStorage.setItem("username", authResult.username);
       }
-      if (authData.credits) {
-        localStorage.setItem("remaining_generations", authData.credits.toString());
+      if (authResult.credits) {
+        localStorage.setItem("remaining_generations", authResult.credits.toString());
       }
       
       // Set Instagram connected flag
       localStorage.setItem("instagram_connected", "true");
       
       // Show success message
-      toast.success(`Connected as ${authData.username || 'user'}`);
+      toast.success(`Connected as ${authResult.username || 'user'}`);
       
       // Reload the page to update the UI state
       window.location.reload();
