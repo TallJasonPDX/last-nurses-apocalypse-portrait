@@ -38,13 +38,13 @@ const groupExamples = [
     id: "group1",
     original: "https://thelastnurses.com/images/a-ga_before_1.webp",
     processed: "https://thelastnurses.com/images/b-ga_after_1.png",
-    title: "Medical Team"
+    title: "Group of up to 3 people"
   },
   {
     id: "group2",
     original: "https://thelastnurses.com/images/c-ga_before_2.jpg",
     processed: "https://thelastnurses.com/images/d-ga_after_2.png",
-    title: "Hospital Staff"
+    title: "Hospital (inside or out)"
   }
 ];
 
