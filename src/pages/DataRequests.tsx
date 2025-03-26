@@ -11,8 +11,16 @@ export default function DataRequests() {
           <div className="prose prose-invert mx-auto">
             <h1 className="text-4xl font-display mb-8 text-white">Data Requests</h1>
             <div className="text-white/80 space-y-6">
-              <p>This is where your HTML data requests content will go.</p>
-              <p>The content in this div will adapt to standard site fonts and styles.</p>
+              <h1>Request Data Deletion</h1>
+  <p>If you would like to request deletion of your personal data from our systems, please email us at:</p>
+  <p><a href="mailto:dataquestions@replacern.com">dataquestions@replacern.com</a></p>
+  <p>Include the following details in your email:</p>
+  <ul>
+    <li>Your full name</li>
+    <li>The email address you used within the app</li>
+    <li>A description of the data or image(s) you wish to delete</li>
+  </ul>
+  <p>We will confirm receipt of your request and process it within 30 days.</p>
             </div>
           </div>
         </div>
