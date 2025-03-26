@@ -7,26 +7,26 @@ import Footer from "@/components/Footer";
 const examples = [
   {
     id: "ex1",
-    original: "https://thelastnurse.com/public/meredith2.jpg",
-    processed: "https://thelastnurse.com/public/day2-1.png",
+    original: "https://thelastnurses.com/public/meredith2.jpg",
+    processed: "https://thelastnurses.com/public/day2-1.png",
     title: "Grey's Anatomy"
   },
   {
     id: "ex2",
-    original: "https://thelastnurse.com/public/res1.jpg",
-    processed: "https://thelastnurse.com/public/day1-2.png",
+    original: "https://thelastnurses.com/public/res1.jpg",
+    processed: "https://thelastnurses.com/public/day1-2.png",
     title: "The Resident"
   },
   {
     id: "ex3",
-    original: "https://thelastnurse.com/public/gd2.jpg",
-    processed: "https://thelastnurse.com/public/day4-1.png",
+    original: "https://thelastnurses.com/public/gd2.jpg",
+    processed: "https://thelastnurses.com/public/day4-1.png",
     title: "The Good Doctor"
   },
   {
     id: "ex4",
-    original: "https://thelastnurse.com/public/std5.jpg",
-    processed: "https://thelastnurse.com/public/day3-1.png",
+    original: "https://thelastnurses.com/public/std5.jpg",
+    processed: "https://thelastnurses.com/public/day3-1.png",
     title: "St. Denis"
   },
 ];
