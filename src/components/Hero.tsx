@@ -72,7 +72,7 @@ export default function Hero() {
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         <img 
-          src="/logo-square.png" 
+          src="/lovable-uploads/a20ec314-a76c-48b0-8f9b-2bafc165ef26.png" 
           alt="The Last Nurses" 
           className="h-24 sm:h-32 md:h-40 mx-auto mb-2" 
         />

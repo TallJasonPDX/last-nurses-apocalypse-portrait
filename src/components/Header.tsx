@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -36,7 +37,7 @@ export default function Header() {
             to="/" 
             className="flex items-center"
           >
-            <img src="/logo-horizontal.png" alt="The Last Nurses" className="h-10" />
+            <img src="/lovable-uploads/960d9792-8d24-4144-9866-3d45b12c670f.png" alt="The Last Nurses" className="h-10" />
           </Link>
           
           {/* Desktop Navigation */}
