@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Download, Share2, Instagram, Twitter, Facebook } from "lucide-react";
 import { toast } from "sonner";
@@ -79,10 +78,9 @@ export default function ResultDisplay({
     // Platform-specific sharing
     switch (platform) {
       case "Twitter":
-        // Twitter (X) uses different sharing parameters
+        // For Twitter, we need to include the actual image URL to make it visible in the tweet
         const twitterText = encodeURIComponent(shareText + "@ReplaceRN");
-        // For Twitter we share directly to the site without including the image URL in text
-        window.open(`https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(siteUrl)}`, "_blank");
+        window.open(`https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(shareableImageUrl)}`, "_blank");
         toast.success("Opening Twitter...");
         break;
         
