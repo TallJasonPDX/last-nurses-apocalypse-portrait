@@ -6,7 +6,7 @@ export default function Terms() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow py-16">
+      <main className="flex-grow py-20">
         <div className="container max-w-3xl mx-auto px-4">
           <div className="prose prose-invert mx-auto">
             
