@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 interface ProcessImageRequest {
@@ -10,6 +11,7 @@ interface JobStatusResponse {
   job_id: string;
   status: string; // Can be "COMPLETED", "completed", "FAILED", "failed", etc.
   output_image?: string;
+  image_url?: string; // Add the direct image URL property
   error?: string;
   message?: string;
 }
