@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -35,11 +34,9 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link 
             to="/" 
-            className="flex items-center space-x-2"
+            className="flex items-center"
           >
-            <span className="text-2xl font-bold text-white distressed-text">
-              THE<span className="text-apocalypse-terminal">LAST</span>NURSES
-            </span>
+            <img src="/logo-horizontal.png" alt="The Last Nurses" className="h-10" />
           </Link>
           
           {/* Desktop Navigation */}
@@ -58,7 +55,7 @@ export default function Header() {
                 location.pathname === "/gallery" ? "text-apocalypse-terminal" : "text-white/80"
               }`}
             >
-              GALLERY
+              YOUR CREATIONS
             </Link>
             <Link 
               to="/examples" 
@@ -130,7 +127,7 @@ export default function Header() {
                 location.pathname === "/gallery" ? "text-apocalypse-terminal" : "text-white/80"
               }`}
             >
-              GALLERY
+              YOUR CREATIONS
             </Link>
             <Link 
               to="/examples" 

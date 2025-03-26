@@ -58,7 +58,7 @@ export default function Hero() {
   }, [displayText, isTyping, isDeleting, currentMessageIndex]);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 py-16 sm:py-24">
+    <section className="relative min-h-[75vh] flex flex-col items-center justify-center overflow-hidden px-4 py-12 sm:py-16">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-apocalypse-green/5 rounded-full filter blur-3xl"></div>
@@ -66,37 +66,18 @@ export default function Hero() {
       </div>
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        <h1 className="mb-6 text-white">
-          <span className="block font-bold opacity-90">THE</span>
-          <span className="block text-apocalypse-terminal distressed-text">LAST</span>
-          <span className="block font-bold opacity-90">NURSES</span>
-        </h1>
+        <img src="/logo-square.png" alt="The Last Nurses" className="h-32 sm:h-40 md:h-48 mx-auto mb-4" />
         
-        <div className="h-20 sm:h-16 flex items-center justify-center mb-8">
+        <div className="h-16 sm:h-14 flex items-center justify-center mb-6">
           <div className="inline-block terminal-text typing-cursor">
             &gt; {displayText}
           </div>
         </div>
         
-        <p className="text-white/70 mb-8 max-w-2xl mx-auto">
-          Transform your nursing photos into post-apocalyptic masterpieces. 
-          Upload your image and watch as our AI reimagines you in a world 
-          where nurses are humanity's last line of defense.
+        <p className="text-white/70 mb-6 max-w-2xl mx-auto">
+          Upload an image of yourself, a group photo (up to 3 people), or hospital scene
+          to transform it into a post-apocalyptic masterpiece.
         </p>
-        
-        <a 
-          href="#upload"
-          className="inline-block px-6 py-3 rounded-md bg-apocalypse-green text-black font-medium transition-transform hover:scale-105 active:scale-100"
-        >
-          Transform Your Image
-        </a>
-      </div>
-      
-      {/* Scrolling Indicator */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-8 h-12 border-2 border-white/30 rounded-full flex justify-center pt-2">
-          <div className="w-1 h-3 bg-white/50 rounded-full"></div>
-        </div>
       </div>
     </section>
   );

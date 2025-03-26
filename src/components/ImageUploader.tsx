@@ -147,12 +147,12 @@ export default function ImageUploader() {
   });
 
   return (
-    <section id="upload" className="py-16 sm:py-24 px-4">
+    <section id="upload" className="py-8 sm:py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-white mb-4">Transform Your Image</h2>
           <p className="text-white/70 max-w-2xl mx-auto">
-            Upload a selfie, group photo (up to 3 people), or hospital scene 
+            Upload an image of yourself, a group photo (up to 3 people), or hospital scene 
             to transform it into a post-apocalyptic masterpiece.
           </p>
         </div>
