@@ -67,22 +67,22 @@ export default function Examples() {
                 
                 <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-4'}`}>
                   <div className="space-y-2">
-                    <div className="aspect-[3/4] overflow-hidden rounded-md">
+                    <div className="w-full rounded-md overflow-hidden">
                       <img 
                         src={example.original} 
                         alt={`Original ${example.title}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-auto object-contain"
                       />
                     </div>
                     <p className="text-center text-white/70 text-sm">Before</p>
                   </div>
                   
                   <div className="space-y-2">
-                    <div className="aspect-[3/4] overflow-hidden rounded-md">
+                    <div className="w-full rounded-md overflow-hidden">
                       <img 
                         src={example.processed} 
                         alt={`Transformed ${example.title}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-auto object-contain"
                       />
                     </div>
                     <p className="text-center text-white/70 text-sm">After</p>
@@ -99,22 +99,22 @@ export default function Examples() {
               
               <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
                 <div className="space-y-2">
-                  <div className="aspect-[16/9] overflow-hidden rounded-md">
+                  <div className="w-full rounded-md overflow-hidden">
                     <img 
                       src={groupExample.original} 
                       alt={`Original ${groupExample.title}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto object-contain"
                     />
                   </div>
                   <p className="text-center text-white/70 text-sm">Before</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="aspect-[16/9] overflow-hidden rounded-md">
+                  <div className="w-full rounded-md overflow-hidden">
                     <img 
                       src={groupExample.processed} 
                       alt={`Transformed ${groupExample.title}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto object-contain"
                     />
                   </div>
                   <p className="text-center text-white/70 text-sm">After</p>
