@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
@@ -21,28 +22,27 @@ export default function Hero() {
   const delayAfterDeleting = useRef(1000); // pause after deleting completes
 
   useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
     if (isTyping) {
       if (displayText.length < messages[currentMessageIndex].length) {
         // Still typing the current message
-        const timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
           setDisplayText(messages[currentMessageIndex].substring(0, displayText.length + 1));
         }, typingSpeed.current);
-        return () => clearTimeout(timeout);
       } else {
         // Finished typing, pause before deleting
         setIsTyping(false);
-        const timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
           setIsDeleting(true);
         }, delayAfterTyping.current);
-        return () => clearTimeout(timeout);
       }
     } else if (isDeleting) {
       if (displayText.length > 0) {
         // Still deleting the current message
-        const timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
           setDisplayText(displayText.substring(0, displayText.length - 1));
         }, deletingSpeed.current);
-        return () => clearTimeout(timeout);
       } else {
         // Finished deleting, move to next message
         setIsDeleting(false);
@@ -51,14 +51,15 @@ export default function Hero() {
         // Briefly hide the cursor during the pause
         setShowCursor(false);
         
-        const timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
           setCurrentMessageIndex(nextIndex);
           setShowCursor(true);
           setIsTyping(true);
         }, delayAfterDeleting.current);
-        return () => clearTimeout(timeout);
       }
     }
+
+    return () => clearTimeout(timeout);
   }, [displayText, isTyping, isDeleting, currentMessageIndex]);
 
   return (
@@ -77,7 +78,7 @@ export default function Hero() {
         />
         
         <div className="h-12 sm:h-14 flex items-center justify-center mb-4">
-          <div className={`inline-block terminal-text ${showCursor ? "typing-cursor" : ""}`}>
+          <div className={`inline-block ${showCursor ? "typing-cursor" : ""}`} style={{ color: "#4fbc77", fontFamily: "'JetBrains Mono', monospace" }}>
             &gt; {displayText}
           </div>
         </div>
