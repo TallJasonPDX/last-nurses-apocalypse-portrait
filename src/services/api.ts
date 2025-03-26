@@ -45,7 +45,7 @@ export const API = {
       }
       
       const responseData = await authUrlResponse.json();
-      const instagramAuthUrl = responseData.auth_url || responseData.url;
+      const instagramAuthUrl = responseData.authorization_url || responseData.auth_url || responseData.url;
       
       if (!instagramAuthUrl) {
         throw new Error('No authorization URL returned from server');
