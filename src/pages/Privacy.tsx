@@ -10,7 +10,7 @@ export default function Privacy() {
         <div className="container max-w-3xl mx-auto px-4">
           <div className="prose prose-invert mx-auto">
             
-            <div className="text-white/80 space-y-6">
+            <div className="text-white/80 space-y-6" style="margin-top:100px;">
 <h1>Privacy Policy</h1>
   <p><strong>Effective Date:</strong> [Insert Date]</p>
   <p>This Privacy Policy describes how Replace RN, a subsidiary of Audience Synergy, LLC ("we", "us", or "our"), collects, uses, and protects your information when you use our web application. Replace RN is located at 228 Park Ave S. Ste 17173, New York, NY 10003.</p>
