@@ -1,10 +1,8 @@
-
 import { toast } from "sonner";
 
 interface ProcessImageRequest {
   workflow_name: string;
   image: string; // base64 encoded
-  endpointId: string;
   waitForResponse?: boolean;
 }
 
@@ -105,8 +103,7 @@ export const API = {
     try {
       const data: ProcessImageRequest = {
         workflow_name: "lastnurses_api", // Using the correct workflow name
-        image: image,
-        endpointId: ENDPOINT_ID,
+        image: `data:image/jpeg;base64,${image}`, // Prepend the required prefix
         waitForResponse: false
       };
       
@@ -155,7 +152,7 @@ export const API = {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/images/job-status/${jobId}?endpointId=${ENDPOINT_ID}`, {
+      const response = await fetch(`${API_BASE_URL}/api/images/job-status/${jobId}`, {
         method: 'GET',
         headers: headers
       });
