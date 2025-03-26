@@ -69,10 +69,21 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="text-center pt-6 border-t border-white/10">
+        <div className="text-center pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/40 text-sm flex items-center justify-center">
             Made with <Heart size={14} className="mx-1 text-apocalypse-rust" /> by ReplaceRN © {new Date().getFullYear()}
           </p>
+          <div className="flex space-x-4 mt-3 md:mt-0 text-sm text-white/40">
+            <Link to="/privacy" className="hover:text-apocalypse-terminal transition-colors">
+              Privacy
+            </Link>
+            <Link to="/terms" className="hover:text-apocalypse-terminal transition-colors">
+              Terms of Service
+            </Link>
+            <Link to="/data-requests" className="hover:text-apocalypse-terminal transition-colors">
+              Data Requests
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
