@@ -108,26 +108,26 @@ export default function Examples() {
                 <h3 className="text-white text-xl mb-4 text-center">{groupExample.title}</h3>
                 
                 <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
-                  <div className="space-y-2">
-                    <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center">
+                  <div className="space-y-2 flex flex-col">
+                    <div className="w-full flex-grow rounded-md overflow-hidden flex items-center justify-center">
                       <img 
                         src={groupExample.original} 
                         alt={`Original ${groupExample.title}`}
                         className="w-full h-auto object-contain"
                       />
                     </div>
-                    <p className="text-center text-white/70 text-sm">Before</p>
+                    <p className="text-center text-white/70 text-sm pt-2">Before</p>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center">
+                  <div className="space-y-2 flex flex-col">
+                    <div className="w-full flex-grow rounded-md overflow-hidden flex items-center justify-center">
                       <img 
                         src={groupExample.processed} 
                         alt={`Transformed ${groupExample.title}`}
                         className="w-full h-auto object-contain"
                       />
                     </div>
-                    <p className="text-center text-white/70 text-sm">After</p>
+                    <p className="text-center text-white/70 text-sm pt-2">After</p>
                   </div>
                 </div>
               </div>
@@ -148,4 +148,3 @@ export default function Examples() {
     </div>
   );
 }
-
