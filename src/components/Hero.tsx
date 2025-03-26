@@ -63,7 +63,7 @@ export default function Hero() {
   }, [displayText, isTyping, isDeleting, currentMessageIndex]);
 
   return (
-    <section className="relative min-h-[65vh] flex flex-col items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
+    <section className="relative min-h-[50vh] sm:min-h-[45vh] flex flex-col items-center justify-center overflow-hidden px-4 py-4 sm:py-6">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-apocalypse-green/5 rounded-full filter blur-3xl"></div>
@@ -74,10 +74,10 @@ export default function Hero() {
         <img 
           src="/logo-square.png" 
           alt="The Last Nurses" 
-          className="h-32 sm:h-40 md:h-48 mx-auto mb-4" 
+          className="h-24 sm:h-32 md:h-40 mx-auto mb-2" 
         />
         
-        <div className="h-16 sm:h-14 flex items-center justify-center mb-6">
+        <div className="h-12 sm:h-14 flex items-center justify-center mb-4">
           <div className={`inline-block terminal-text ${showCursor ? "typing-cursor" : ""}`}>
             &gt; {displayText}
           </div>
