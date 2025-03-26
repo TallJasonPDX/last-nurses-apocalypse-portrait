@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
@@ -16,36 +15,39 @@ export default function Hero() {
   const [isTyping, setIsTyping] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
-  const typingSpeed = useRef(60); // milliseconds per character
-  const deletingSpeed = useRef(30); // milliseconds per character
-  const delayAfterTyping = useRef(2000); // pause after typing completes
-  const delayAfterDeleting = useRef(1000); // pause after deleting completes
+  
+  const typingSpeed = 60; // milliseconds per character
+  const deletingSpeed = 30; // milliseconds per character
+  const delayAfterTyping = 2000; // pause after typing completes
+  const delayAfterDeleting = 1000; // pause after deleting completes
 
   useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
+    let timeout;
 
     if (isTyping) {
       if (displayText.length < messages[currentMessageIndex].length) {
         // Still typing the current message
         timeout = setTimeout(() => {
           setDisplayText(messages[currentMessageIndex].substring(0, displayText.length + 1));
-        }, typingSpeed.current);
+        }, typingSpeed);
       } else {
         // Finished typing, pause before deleting
-        setIsTyping(false);
         timeout = setTimeout(() => {
           setIsDeleting(true);
-        }, delayAfterTyping.current);
+          setIsTyping(false);
+        }, delayAfterTyping);
       }
     } else if (isDeleting) {
       if (displayText.length > 0) {
         // Still deleting the current message
         timeout = setTimeout(() => {
           setDisplayText(displayText.substring(0, displayText.length - 1));
-        }, deletingSpeed.current);
+        }, deletingSpeed);
       } else {
-        // Finished deleting, move to next message
+        // Finished deleting, prepare for next message
         setIsDeleting(false);
+        
+        // Calculate next message index
         const nextIndex = (currentMessageIndex + 1) % messages.length;
         
         // Briefly hide the cursor during the pause
@@ -55,7 +57,7 @@ export default function Hero() {
           setCurrentMessageIndex(nextIndex);
           setShowCursor(true);
           setIsTyping(true);
-        }, delayAfterDeleting.current);
+        }, delayAfterDeleting);
       }
     }
 
