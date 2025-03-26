@@ -40,7 +40,6 @@ const groupExamples = [
     processed: "https://thelastnurses.com/images/b-ga_after_1.png",
     title: "Medical Team"
   },
-  // You can add more group examples here as needed
   {
     id: "group2",
     original: "https://thelastnurses.com/images/c-ga_before_2.jpg",
@@ -110,7 +109,7 @@ export default function Examples() {
                 
                 <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
                   <div className="space-y-2">
-                    <div className="w-full rounded-md overflow-hidden">
+                    <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center">
                       <img 
                         src={groupExample.original} 
                         alt={`Original ${groupExample.title}`}
@@ -121,7 +120,7 @@ export default function Examples() {
                   </div>
                   
                   <div className="space-y-2">
-                    <div className="w-full rounded-md overflow-hidden">
+                    <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center">
                       <img 
                         src={groupExample.processed} 
                         alt={`Transformed ${groupExample.title}`}
@@ -149,3 +148,4 @@ export default function Examples() {
     </div>
   );
 }
+
