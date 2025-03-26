@@ -9,7 +9,7 @@ export default function Privacy() {
       <main className="flex-grow py-16">
         <div className="container max-w-3xl mx-auto px-4">
           <div className="prose prose-invert mx-auto">
-            <h1 className="text-4xl font-display mb-8 text-white">Privacy Policy</h1>
+            
             <div className="text-white/80 space-y-6">
 <h1>Privacy Policy</h1>
   <p><strong>Effective Date:</strong> [Insert Date]</p>
