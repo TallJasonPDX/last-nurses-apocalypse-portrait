@@ -72,9 +72,9 @@ export default function Hero() {
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         <img 
-          src="/lovable-uploads/a20ec314-a76c-48b0-8f9b-2bafc165ef26.png" 
+          src="/lovable-uploads/c019ad25-4927-4d04-9a51-90529a3fc245.png" 
           alt="The Last Nurses" 
-          className="h-24 sm:h-32 md:h-40 mx-auto mb-2" 
+          className="w-[60%] sm:w-[400px] mx-auto mb-2" 
         />
         
         <div className="h-12 sm:h-14 flex items-center justify-center mb-4">
