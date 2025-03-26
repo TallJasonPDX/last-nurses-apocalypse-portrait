@@ -13,7 +13,7 @@ export default function Terms() {
             
             <div className="text-white/80 space-y-6">
              <h1>Terms of Service</h1>
-  <p><strong>Effective Date:</strong> [Insert Date]</p>
+  <p><strong>Effective Date:</strong> 3/1/2025</p>
   <p>These Terms of Service govern your use of the web application operated by Replace RN, a subsidiary of Audience Synergy, LLC, located at 228 Park Ave S. Ste 17173, New York, NY 10003.</p>
 
   <h2>Eligibility</h2>
