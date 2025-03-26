@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 
 const messages = [
@@ -66,7 +67,7 @@ export default function Hero() {
           className="w-[94%] sm:w-[400px] mx-auto mb-2" 
         />
         
-        <div className="font-mono text-left text-apocalypse-green mb-4 max-w-2xl mx-auto h-12 sm:h-14">
+        <div className="font-mono text-left text-[#4e945d] mb-4 max-w-2xl mx-auto h-12 sm:h-14">
           {/* Terminal line with typing effect */}
           <div className={`terminal-line ${showCursor ? "typing-cursor" : ""}`}>
             &gt; {displayText}
