@@ -81,8 +81,8 @@ export default function ResultDisplay({
       case "Twitter":
         // Twitter (X) uses different sharing parameters
         const twitterText = encodeURIComponent(shareText + "@ReplaceRN");
-        // For Twitter we include the image URL directly
-        window.open(`https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(shareableImageUrl)}`, "_blank");
+        // For Twitter we share directly to the site without including the image URL in text
+        window.open(`https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(siteUrl)}`, "_blank");
         toast.success("Opening Twitter...");
         break;
         
