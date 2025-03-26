@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock examples data
 const examples = [
@@ -40,6 +41,8 @@ const groupExample = {
 };
 
 export default function Examples() {
+  const isMobile = useIsMobile();
+  
   useEffect(() => {
     // Set the document title with the Examples page suffix
     document.title = "The Last Nurses - A Replace_RN application - Examples";
@@ -62,7 +65,7 @@ export default function Examples() {
               <div key={example.id} className="glass rounded-lg overflow-hidden p-4">
                 <h3 className="text-white text-xl mb-4 text-center">{example.title}</h3>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-4'}`}>
                   <div className="space-y-2">
                     <div className="aspect-[3/4] overflow-hidden rounded-md">
                       <img 
@@ -94,7 +97,7 @@ export default function Examples() {
             <div className="glass rounded-lg overflow-hidden p-4">
               <h3 className="text-white text-xl mb-4 text-center">{groupExample.title}</h3>
               
-              <div className="grid grid-cols-2 gap-8">
+              <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
                 <div className="space-y-2">
                   <div className="aspect-[16/9] overflow-hidden rounded-md">
                     <img 
