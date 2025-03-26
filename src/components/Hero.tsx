@@ -58,7 +58,7 @@ export default function Hero() {
   }, [displayText, isTyping, isDeleting, currentMessageIndex]);
 
   return (
-    <section className="relative min-h-[75vh] flex flex-col items-center justify-center overflow-hidden px-4 py-12 sm:py-16">
+    <section className="relative min-h-[65vh] flex flex-col items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/3 w-64 h-64 bg-apocalypse-green/5 rounded-full filter blur-3xl"></div>
@@ -66,18 +66,17 @@ export default function Hero() {
       </div>
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        <img src="/logo-square.png" alt="The Last Nurses" className="h-32 sm:h-40 md:h-48 mx-auto mb-4" />
+        <img 
+          src="/logo-square.png" 
+          alt="The Last Nurses" 
+          className="h-32 sm:h-40 md:h-48 mx-auto mb-4" 
+        />
         
         <div className="h-16 sm:h-14 flex items-center justify-center mb-6">
           <div className="inline-block terminal-text typing-cursor">
             &gt; {displayText}
           </div>
         </div>
-        
-        <p className="text-white/70 mb-6 max-w-2xl mx-auto">
-          Upload an image of yourself, a group photo (up to 3 people), or hospital scene
-          to transform it into a post-apocalyptic masterpiece.
-        </p>
       </div>
     </section>
   );

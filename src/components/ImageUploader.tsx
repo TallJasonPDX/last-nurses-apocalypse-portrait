@@ -147,21 +147,21 @@ export default function ImageUploader() {
   });
 
   return (
-    <section id="upload" className="py-8 sm:py-12 px-4">
+    <section id="upload" className="py-4 sm:py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-white mb-4">Transform Your Image</h2>
+        <div className="text-center mb-6">
+          <h2 className="text-white mb-3">Transform Your Image</h2>
           <p className="text-white/70 max-w-2xl mx-auto">
             Upload an image of yourself, a group photo (up to 3 people), or hospital scene 
             to transform it into a post-apocalyptic masterpiece.
           </p>
         </div>
         
-        <div className="glass rounded-lg p-6 mb-8">
+        <div className="glass rounded-lg p-6 mb-6">
           {!selectedImage ? (
             // Upload interface
             <div 
-              className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-apocalypse-terminal/50"
+              className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-apocalypse-terminal/50"
               onClick={handleUploadClick}
             >
               <input 
@@ -172,7 +172,7 @@ export default function ImageUploader() {
                 onChange={handleFileChange}
               />
               
-              <Upload className="mx-auto mb-4 text-white/60" size={48} />
+              <Upload className="mx-auto mb-3 text-white/60" size={40} />
               <h3 className="text-xl text-white mb-2">Upload Your Image</h3>
               <p className="text-white/60 mb-4">
                 Click or drag and drop your image here
@@ -197,7 +197,7 @@ export default function ImageUploader() {
           ) : (
             // Image preview before processing
             <div className="text-center">
-              <div className="relative w-full max-w-md mx-auto mb-6">
+              <div className="relative w-full max-w-md mx-auto mb-4">
                 <img 
                   src={selectedImage} 
                   alt="Selected Image" 
@@ -228,7 +228,7 @@ export default function ImageUploader() {
                 </button>
               </div>
               
-              <p className="mt-4 text-sm text-white/60">
+              <p className="mt-3 text-sm text-white/60">
                 You have {remainingGenerations} image transformations remaining
               </p>
             </div>
