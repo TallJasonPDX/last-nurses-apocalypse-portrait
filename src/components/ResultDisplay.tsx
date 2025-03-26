@@ -78,11 +78,7 @@ export default function ResultDisplay({
     // Platform-specific sharing
     switch (platform) {
       case "Twitter":
-<<<<<<< HEAD
-        // This line contains the text that shows the Lovable reference
-=======
         // For Twitter, we need to include the actual image URL to make it visible in the tweet
->>>>>>> 41f7df8f17e02c9256c77edb2976cba0f93539e4
         const twitterText = encodeURIComponent(shareText + "@ReplaceRN");
         window.open(`https://twitter.com/intent/tweet?text=${twitterText}&url=${encodeURIComponent(shareableImageUrl)}`, "_blank");
         toast.success("Opening Twitter...");
