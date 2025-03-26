@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
@@ -72,7 +71,7 @@ export default function Hero() {
       
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         <img 
-          src="/lovable-uploads/c019ad25-4927-4d04-9a51-90529a3fc245.png" 
+          src="/lovable-uploads/59977c5a-cfc6-45ed-b037-b1fff5e1f247.png" 
           alt="The Last Nurses" 
           className="w-[60%] sm:w-[400px] mx-auto mb-2" 
         />
