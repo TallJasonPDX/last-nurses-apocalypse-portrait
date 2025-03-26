@@ -11,7 +11,7 @@ export default function Footer() {
             <h3 className="text-white text-lg mb-4">THE LAST NURSES</h3>
             <p className="text-white/60 text-sm mb-4">
               Transform your nursing photos into post-apocalyptic masterpieces. 
-              A tool created by nurses, for nurses.
+              A tool created just for nurses.
             </p>
             <div className="flex space-x-4">
               <a 
@@ -54,8 +54,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white text-base mb-4">Support Us</h4>
             <p className="text-white/60 text-sm mb-4">
-              We're run by a few individuals and not backed by any large company 
-              or investors. Your support helps us keep this project alive.
+              It is expensive to run the servers that process these image transformations. Your $2 - $5 donation helps us run this project and build more fun nurse experiences.
             </p>
             <a 
               href="https://venmo.com/replace_rn" 
