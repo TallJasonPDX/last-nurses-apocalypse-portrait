@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const messages = [
+  "The Last Nurses to conquer a pandemic without PPE",
   "The Last Nurses to protect patients in an understaffed unit",
   "The Last Nurses to defend themselves against zombie (patient) attacks",
   "The Last Nurses to provide healthcare in a world turning against science",
