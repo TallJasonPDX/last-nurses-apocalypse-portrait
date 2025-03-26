@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 interface ProcessImageRequest {
@@ -30,9 +29,28 @@ const API_BASE_URL = "https://sdbe.replit.app";
 const ENDPOINT_ID = "ep-post-apocalyptic-nurse-01"; // Production endpoint ID
 
 export const API = {
-  // Instagram authentication
+  // Instagram authentication based on the API docs
   connectInstagram: async (): Promise<void> => {
     try {
+      // Get the authorization URL from the backend first
+      const authUrlResponse = await fetch(`${API_BASE_URL}/api/auth/instagram/authorize`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!authUrlResponse.ok) {
+        throw new Error('Failed to get Instagram authorization URL');
+      }
+      
+      const authData = await authUrlResponse.json();
+      const instagramAuthUrl = authData.auth_url || authData.url;
+      
+      if (!instagramAuthUrl) {
+        throw new Error('No authorization URL returned from server');
+      }
+      
       // Open Instagram OAuth page in a popup window
       const width = 600;
       const height = 700;
@@ -40,36 +58,74 @@ export const API = {
       const top = window.innerHeight / 2 - height / 2;
       
       const popup = window.open(
-        `${API_BASE_URL}/auth/instagram`,
+        instagramAuthUrl,
         'instagram-auth',
         `width=${width},height=${height},top=${top},left=${left}`
       );
       
-      // Listen for messages from the popup
+      // Listen for the redirect back with auth code
       const authPromise = new Promise<AuthResponse>((resolve, reject) => {
-        window.addEventListener('message', (event) => {
-          // Verify origin to ensure it's from our backend
-          if (event.origin === API_BASE_URL) {
-            const data = event.data;
+        // Function to handle the redirect with code parameter
+        const handleRedirect = async (redirectUrl: string) => {
+          try {
+            // Extract the auth code from the URL
+            const url = new URL(redirectUrl);
+            const code = url.searchParams.get('code');
             
-            if (data.success) {
-              resolve(data);
-            } else {
-              reject(new Error(data.error || 'Authentication failed'));
+            if (!code) {
+              reject(new Error('No authorization code provided'));
+              return;
             }
             
-            // Close the popup
-            if (popup) popup.close();
+            // Call the login endpoint with the auth code
+            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/instagram-login?code=${code}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (!loginResponse.ok) {
+              const errorData = await loginResponse.json();
+              throw new Error(errorData.detail || 'Authentication failed');
+            }
+            
+            const userData = await loginResponse.json();
+            resolve({
+              success: true,
+              token: userData.access_token,
+              username: userData.username || userData.user?.username,
+              credits: userData.credits || userData.remaining_generations || 10
+            });
+          } catch (error) {
+            reject(error);
           }
-        }, { once: true });
+        };
         
-        // Handle popup being closed manually
-        const checkClosed = setInterval(() => {
-          if (popup && popup.closed) {
-            clearInterval(checkClosed);
-            reject(new Error('Authentication window was closed'));
-          }
-        }, 500);
+        // Check if window location changes in the popup
+        if (popup) {
+          const checkPopup = setInterval(() => {
+            try {
+              // When the popup redirects to our domain
+              if (popup.location.hostname === window.location.hostname) {
+                clearInterval(checkPopup);
+                handleRedirect(popup.location.href);
+                popup.close();
+              }
+            } catch (e) {
+              // Cross-origin error, ignore
+            }
+          }, 500);
+          
+          // Handle popup being closed manually
+          const checkClosed = setInterval(() => {
+            if (popup && popup.closed) {
+              clearInterval(checkClosed);
+              clearInterval(checkPopup);
+              reject(new Error('Authentication window was closed'));
+            }
+          }, 500);
+        }
       });
       
       // Wait for authentication to complete
