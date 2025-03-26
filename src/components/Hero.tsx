@@ -10,7 +10,6 @@ const messages = [
 ];
 
 export default function Hero() {
-  const [messageLines, setMessageLines] = useState([""]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [displayText, setDisplayText] = useState("");
@@ -32,8 +31,6 @@ export default function Hero() {
       } else {
         // Finished typing, pause before showing new line
         timeout = setTimeout(() => {
-          // Add current line to message history
-          setMessageLines(prev => [...prev, `> ${displayText}`]);
           // Clear current typing display
           setDisplayText("");
           setIsTyping(false);
@@ -69,15 +66,8 @@ export default function Hero() {
           className="w-[94%] sm:w-[400px] mx-auto mb-2" 
         />
         
-        <div className="font-mono text-left text-apocalypse-green mb-4 max-w-2xl mx-auto h-[120px] overflow-hidden">
-          {/* Previous messages (up to 3) */}
-          <div className="terminal-history">
-            {messageLines.slice(-3).map((line, i) => (
-              <div key={i} className="terminal-line">{line}</div>
-            ))}
-          </div>
-          
-          {/* Current typing line */}
+        <div className="font-mono text-left text-apocalypse-green mb-4 max-w-2xl mx-auto h-12 sm:h-14">
+          {/* Terminal line with typing effect */}
           <div className={`terminal-line ${showCursor ? "typing-cursor" : ""}`}>
             &gt; {displayText}
           </div>
