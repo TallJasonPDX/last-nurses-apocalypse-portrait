@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface GalleryImage {
   id: string;
@@ -97,11 +98,11 @@ export default function Gallery() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((item) => (
                   <div key={item.id} className="glass rounded-lg overflow-hidden transition-transform hover:scale-105">
-                    <div className="relative aspect-video">
+                    <div className="relative">
                       <img 
                         src={item.processed} 
                         alt="Transformed image" 
-                        className="w-full h-full object-cover"
+                        className="w-full h-auto object-contain"
                       />
                     </div>
                     
@@ -141,7 +142,7 @@ export default function Gallery() {
               </p>
               <button 
                 onClick={handleInstagramLogin}
-                className="px-4 py-2 bg-gradient-to-r from-[#405DE6] via-[#5B51D8] to-[#833AB4] text-white rounded-md transition-transform hover:scale-105"
+                className="px-4 py-2 bg-gradient-to-r from-[#405DE6] via-[#5B51D8] to-[#833AB4] text-white rounded-md transition-colors hover:scale-105"
               >
                 Connect Instagram
               </button>
