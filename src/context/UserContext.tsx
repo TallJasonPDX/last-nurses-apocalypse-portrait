@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type UserContextType = {
@@ -10,6 +9,7 @@ type UserContextType = {
   login: (token: string) => void;
   logout: () => void;
   decrementGenerations: () => void;
+  increaseGenerationsForFollow: () => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -24,12 +24,11 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [remainingGenerations, setRemainingGenerations] = useState(3); // Free tier limit
-  const [totalGenerations, setTotalGenerations] = useState(3);
+  const [remainingGenerations, setRemainingGenerations] = useState(1); // Changed from 3 to 1
+  const [totalGenerations, setTotalGenerations] = useState(1); // Changed from 3 to 1
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
-  // Initialize state from localStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("auth_token");
     const storedUsername = localStorage.getItem("username");
@@ -45,7 +44,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const generations = parseInt(storedGenerations, 10);
         setRemainingGenerations(generations);
         
-        // If Instagram connected, give more free generations
         if (storedInstagramConnected === "true") {
           setTotalGenerations(10);
         } else {
@@ -56,7 +54,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (token: string) => {
-    // For this version, we'll simulate a login
     localStorage.setItem("auth_token", token);
     localStorage.setItem("username", "user" + Math.floor(Math.random() * 1000));
     localStorage.setItem("remaining_generations", "5");
@@ -86,6 +83,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("remaining_generations", newValue.toString());
   };
 
+  const increaseGenerationsForFollow = () => {
+    const newValue = 11; // 1 initial + 10 for following
+    setRemainingGenerations(newValue);
+    setTotalGenerations(newValue);
+    localStorage.setItem("remaining_generations", newValue.toString());
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -97,9 +101,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         decrementGenerations,
+        increaseGenerationsForFollow,
       }}
     >
       {children}
     </UserContext.Provider>
   );
 };
+
+export { UserProvider };

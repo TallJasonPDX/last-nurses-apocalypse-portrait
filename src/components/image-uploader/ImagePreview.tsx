@@ -1,4 +1,3 @@
-
 import { Camera, X } from "lucide-react";
 
 interface ImagePreviewProps {
@@ -48,10 +47,6 @@ export default function ImagePreview({
           Transform Image
         </button>
       </div>
-      
-      <p className="mt-3 text-sm text-white/60">
-        You have {remainingGenerations} image transformations remaining
-      </p>
     </div>
   );
 }
