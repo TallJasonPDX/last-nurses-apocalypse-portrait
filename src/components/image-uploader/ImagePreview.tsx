@@ -1,5 +1,6 @@
 
-import { Camera, X } from "lucide-react";
+import { Camera, X, CircleDot } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 interface ImagePreviewProps {
   imageUrl: string;
@@ -16,6 +17,8 @@ export default function ImagePreview({
   onChooseDifferent, 
   onProcessImage 
 }: ImagePreviewProps) {
+  const { totalGenerations } = useUser();
+  
   return (
     <div className="text-center">
       <div className="relative w-full max-w-md mx-auto mb-4">
@@ -33,6 +36,13 @@ export default function ImagePreview({
       </div>
       
       <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+        {totalGenerations > 1 && (
+          <div className="flex items-center space-x-2 text-white/80 mb-4 sm:mb-0">
+            <CircleDot size={16} />
+            <span>{remainingGenerations} generations remaining</span>
+          </div>
+        )}
+        
         <button 
           onClick={onChooseDifferent}
           className="px-4 py-2 bg-apocalypse-gray/80 hover:bg-apocalypse-gray text-white rounded-md transition-colors inline-flex items-center space-x-2"
@@ -51,3 +61,4 @@ export default function ImagePreview({
     </div>
   );
 }
+
