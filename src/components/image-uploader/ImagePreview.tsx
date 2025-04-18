@@ -1,3 +1,4 @@
+
 import { Camera, X } from "lucide-react";
 
 interface ImagePreviewProps {

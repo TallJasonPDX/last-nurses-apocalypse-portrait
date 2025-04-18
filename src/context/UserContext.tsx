@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type UserContextType = {
@@ -24,8 +25,8 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [remainingGenerations, setRemainingGenerations] = useState(1); // Changed from 3 to 1
-  const [totalGenerations, setTotalGenerations] = useState(1); // Changed from 3 to 1
+  const [remainingGenerations, setRemainingGenerations] = useState(1); // Default is now 1
+  const [totalGenerations, setTotalGenerations] = useState(1); // Default is now 1
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
@@ -109,4 +110,4 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export { UserProvider };
+// The duplicate export was here - removed to fix the error
