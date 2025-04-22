@@ -157,6 +157,127 @@ export const API = {
     }
   },
   
+  connectFacebook: async (): Promise<void> => {
+    try {
+      // Step 1: Get Facebook authorization URL from backend
+      const authUrlResponse = await fetch(`${API_BASE_URL}/api/auth/facebook/authorize`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!authUrlResponse.ok) {
+        throw new Error('Failed to get Facebook authorization URL');
+      }
+
+      const responseData = await authUrlResponse.json();
+      const facebookAuthUrl =
+        responseData.authorization_url ||
+        responseData.auth_url ||
+        responseData.url;
+
+      if (!facebookAuthUrl) {
+        throw new Error('No authorization URL returned from server');
+      }
+
+      // Open Facebook OAuth page in a popup window
+      const width = 600;
+      const height = 700;
+      const left = window.innerWidth / 2 - width / 2;
+      const top = window.innerHeight / 2 - height / 2;
+      const popup = window.open(
+        facebookAuthUrl,
+        'facebook-auth',
+        `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      // Listen for the redirect back with code parameter
+      const authPromise = new Promise((resolve, reject) => {
+        const handleRedirect = async (redirectUrl: string) => {
+          try {
+            const url = new URL(redirectUrl);
+            const code = url.searchParams.get('code');
+
+            if (!code) {
+              reject(new Error('No authorization code provided'));
+              return;
+            }
+
+            // Call backend to exchange code for a token
+            const loginResponse = await fetch(
+              `${API_BASE_URL}/api/auth/facebook-login?code=${code}`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+
+            if (!loginResponse.ok) {
+              const errorData = await loginResponse.json();
+              throw new Error(errorData.detail || 'Authentication failed');
+            }
+
+            const userData = await loginResponse.json();
+            resolve(userData);
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        if (popup) {
+          const checkPopup = setInterval(() => {
+            try {
+              // Only proceed if redirected back to the same domain
+              if (popup.location.hostname === window.location.hostname) {
+                clearInterval(checkPopup);
+                handleRedirect(popup.location.href);
+                popup.close();
+              }
+            } catch (_) {
+              // Cross-origin, ignore until it returns to our domain
+            }
+          }, 500);
+
+          // Detect if popup closed before completion
+          const checkClosed = setInterval(() => {
+            if (popup.closed) {
+              clearInterval(checkClosed);
+              clearInterval(checkPopup);
+              reject(new Error('Authentication window was closed'));
+            }
+          }, 500);
+        }
+      });
+
+      // Wait for backend authentication
+      const authResult: any = await authPromise;
+
+      // Store auth info in localStorage
+      if (authResult.access_token) {
+        localStorage.setItem("auth_token", authResult.access_token);
+      }
+      if (authResult.username) {
+        localStorage.setItem("username", authResult.username);
+      }
+      if (authResult.credits) {
+        localStorage.setItem("remaining_generations", authResult.credits.toString());
+      }
+
+      localStorage.setItem("facebook_connected", "true");
+
+      // Show success message
+      toast.success(`Connected as ${authResult.username || 'user'} (Facebook)`);
+
+      // Reload the page to update state/UI
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Facebook authentication error:', error);
+      toast.error("Failed to connect with Facebook. Please try again.");
+    }
+  },
+  
   processImage: async (image: string): Promise<JobStatusResponse> => {
     try {
       const data: ProcessImageRequest = {

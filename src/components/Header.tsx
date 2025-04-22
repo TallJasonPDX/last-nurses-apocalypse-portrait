@@ -15,7 +15,6 @@ export default function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -24,8 +23,8 @@ export default function Header() {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  const handleInstagramLogin = () => {
-    API.connectInstagram();
+  const handleFacebookLogin = () => {
+    API.connectFacebook();
   };
 
   return (
@@ -98,10 +97,10 @@ export default function Header() {
               </div>
             ) : (
               <button 
-                onClick={handleInstagramLogin}
-                className="text-xs px-4 py-2 bg-apocalypse-green/80 hover:bg-apocalypse-green text-black rounded-md transition-colors"
+                onClick={handleFacebookLogin}
+                className="text-xs px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
-                CONNECT INSTAGRAM
+                CONNECT FACEBOOK
               </button>
             )}
           </nav>
@@ -168,10 +167,10 @@ export default function Header() {
               </div>
             ) : (
               <button 
-                onClick={handleInstagramLogin}
-                className="text-xs w-full px-4 py-2 bg-apocalypse-green/80 hover:bg-apocalypse-green text-black rounded-md transition-colors"
+                onClick={handleFacebookLogin}
+                className="text-xs w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
-                CONNECT INSTAGRAM
+                CONNECT FACEBOOK
               </button>
             )}
           </nav>
@@ -180,3 +179,4 @@ export default function Header() {
     </header>
   );
 }
+
