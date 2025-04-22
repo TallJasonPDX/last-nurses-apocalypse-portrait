@@ -159,7 +159,7 @@ export const API = {
   
   connectFacebook: async (): Promise<void> => {
     try {
-      // Step 1: Get Facebook authorization URL from backend
+      // Get Facebook authorization URL from backend
       const authUrlResponse = await fetch(`${API_BASE_URL}/api/auth/facebook/authorize`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -169,6 +169,7 @@ export const API = {
         throw new Error('Failed to get Facebook authorization URL');
       }
 
+      // The backend should return a JSON with the auth url (authorization_url, auth_url, or url)
       const responseData = await authUrlResponse.json();
       const facebookAuthUrl =
         responseData.authorization_url ||
@@ -268,7 +269,6 @@ export const API = {
 
       // Show success message
       toast.success(`Connected as ${authResult.username || 'user'} (Facebook)`);
-
       // Reload the page to update state/UI
       window.location.reload();
 

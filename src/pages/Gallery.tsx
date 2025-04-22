@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,7 +15,6 @@ interface GalleryImage {
 
 export default function Gallery() {
   useEffect(() => {
-    // Set the document title with the Gallery page suffix
     document.title = "The Last Nurses - A Replace_RN application - Gallery";
   }, []);
 
@@ -35,7 +33,6 @@ export default function Gallery() {
       try {
         const images = await API.getUserImages();
         
-        // Transform API response to our gallery format
         const galleryImages = images.map(img => ({
           id: img.id || img._id,
           original: img.original_image || img.originalImage,
@@ -54,11 +51,10 @@ export default function Gallery() {
     fetchGallery();
   }, [isLoggedIn]);
 
-  const handleInstagramLogin = () => {
-    API.connectInstagram();
+  const handleFacebookLogin = () => {
+    API.connectFacebook();
   };
 
-  // Format date
   const formatDate = (date: Date) => {
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
@@ -138,13 +134,14 @@ export default function Gallery() {
             <div className="text-center py-12 glass rounded-lg">
               <h3 className="text-white text-xl mb-4">Sign In Required</h3>
               <p className="text-white/70 mb-6">
-                Please sign in with Instagram to view your personal gallery.
+                Please sign in with Facebook to view your personal gallery.
               </p>
               <button 
-                onClick={handleInstagramLogin}
-                className="px-4 py-2 bg-gradient-to-r from-[#405DE6] via-[#5B51D8] to-[#833AB4] text-white rounded-md transition-colors hover:scale-105"
+                onClick={handleFacebookLogin}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors hover:scale-105 flex items-center justify-center gap-2"
               >
-                Connect Instagram
+                <svg width="20" height="20" fill="currentColor" className="inline mr-2" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.733 0-1.325.592-1.325 1.326v21.348c0 .733.592 1.326 1.325 1.326h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24h-1.918c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.733 0 1.325-.593 1.325-1.326V1.326C24 .592 23.408 0 22.675 0"/></svg>
+                Connect Facebook
               </button>
             </div>
           )}
