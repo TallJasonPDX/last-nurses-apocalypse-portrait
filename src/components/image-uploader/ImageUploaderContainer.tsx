@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
@@ -11,7 +12,7 @@ import { API, encodeImageToBase64 } from "@/services/api";
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // New state for direct image URL
   const [isProcessing, setIsProcessing] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -19,15 +20,18 @@ export default function ImageUploaderContainer() {
   const pollInterval = useRef<NodeJS.Timeout | null>(null);
   const { remainingGenerations, decrementGenerations } = useUser();
 
+  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // Validate file is an image
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
     
+    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("Image size must be less than 10MB");
       return;
@@ -43,23 +47,27 @@ export default function ImageUploaderContainer() {
     reader.readAsDataURL(file);
   };
 
+  // Clear selected image
   const handleClearImage = () => {
     setSelectedImage(null);
     setProcessedImage(null);
-    setImageUrl(null);
+    setImageUrl(null); // Clear the image URL as well
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
     
+    // Clear any polling
     if (pollInterval.current) {
       clearInterval(pollInterval.current);
       pollInterval.current = null;
     }
   };
 
+  // Process the image
   const handleProcessImage = async () => {
     if (!selectedImage) return;
     
+    // Check if user has remaining generations
     if (remainingGenerations <= 0) {
       setShowLimitModal(true);
       return;
@@ -68,11 +76,14 @@ export default function ImageUploaderContainer() {
     try {
       setIsProcessing(true);
       
+      // Convert the data URL to base64
       const base64Data = selectedImage.split(",")[1];
       
+      // Send to API
       const response = await API.processImage(base64Data);
       setJobId(response.job_id);
       
+      // Start polling for job status
       pollInterval.current = setInterval(async () => {
         try {
           if (!response.job_id) return;
@@ -80,14 +91,18 @@ export default function ImageUploaderContainer() {
           const statusResponse = await API.getJobStatus(response.job_id);
           console.log("Status response:", statusResponse);
           
+          // Check for both 'COMPLETED' and 'completed' status values
           if ((statusResponse.status === "COMPLETED" || statusResponse.status === "completed") && statusResponse.output_image) {
+            // Job is complete
             setProcessedImage(statusResponse.output_image);
+            // Store the direct image URL if available
             if (statusResponse.image_url) {
               setImageUrl(statusResponse.image_url);
             }
             setIsProcessing(false);
             decrementGenerations();
             
+            // Clear interval
             if (pollInterval.current) {
               clearInterval(pollInterval.current);
               pollInterval.current = null;
@@ -95,25 +110,30 @@ export default function ImageUploaderContainer() {
             
             toast.success("Your image has been transformed!");
           } else if (statusResponse.status === "FAILED" || statusResponse.status === "failed") {
+            // Job failed
             setIsProcessing(false);
             toast.error(statusResponse.error || "Failed to process image");
             
+            // Clear interval
             if (pollInterval.current) {
               clearInterval(pollInterval.current);
               pollInterval.current = null;
             }
           }
+          // If still processing, continue polling
         } catch (error) {
           console.error("Error polling job status:", error);
           setIsProcessing(false);
           toast.error("Failed to check processing status");
           
+          // Clear interval
           if (pollInterval.current) {
             clearInterval(pollInterval.current);
             pollInterval.current = null;
           }
         }
-      }, 5000);
+      }, 5000); // Poll every 5 seconds
+      
     } catch (error) {
       console.error("Error processing image:", error);
       setIsProcessing(false);
@@ -121,6 +141,7 @@ export default function ImageUploaderContainer() {
     }
   };
 
+  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (pollInterval.current) {
@@ -135,7 +156,7 @@ export default function ImageUploaderContainer() {
         <h2 className="text-white mb-3">Transform Your Image</h2>
         <p className="text-white/70 max-w-2xl mx-auto">
           Upload an image of yourself, a group photo (up to 3 people), or your hospital (inside or out) 
-          to transform it into a post-apocalyptic masterpiece. Tips: Use clear photos and avoid small faces (including in the background). Allow room around each person so we can transform the environment as well.
+          to transform it into a post-apocalyptic masterpiece.  Tips: Use clear photos and avoid small faces (including in the background).  Allow room around each person so we can transform the environment as well.
         </p>
       </div>
       
@@ -146,7 +167,7 @@ export default function ImageUploaderContainer() {
           <ResultDisplay 
             originalImage={selectedImage}
             processedImage={processedImage}
-            imageUrl={imageUrl || undefined}
+            imageUrl={imageUrl || undefined} // Pass the direct image URL
             onReset={handleClearImage}
           />
         ) : isProcessing ? (
@@ -168,6 +189,7 @@ export default function ImageUploaderContainer() {
         </p>
       </div>
       
+      {/* Limit Reached Modal */}
       {showLimitModal && (
         <LimitReachedModal onClose={() => setShowLimitModal(false)} />
       )}

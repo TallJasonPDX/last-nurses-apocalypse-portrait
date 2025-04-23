@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 
@@ -326,12 +325,12 @@ export const API = {
         'Content-Type': 'application/json'
       };
       
-      // Add auth token if available, but don't require it
+      // Add auth token if available
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      // Make the actual API call to the backend - now works for both guests and authenticated users
+      // Make the actual API call to the backend
       const response = await fetch(`${API_BASE_URL}/api/images/process-image`, {
         method: 'POST',
         headers: headers,
@@ -361,7 +360,7 @@ export const API = {
         'Content-Type': 'application/json'
       };
       
-      // Add auth token if available, but don't require it
+      // Add auth token if available
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
