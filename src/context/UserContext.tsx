@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { getAnonymousQuota } from "@/hooks/useAnonymousId";
 
 type UserContextType = {
   isLoggedIn: boolean;
@@ -25,8 +26,8 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [remainingGenerations, setRemainingGenerations] = useState(1); // Default is now 1
-  const [totalGenerations, setTotalGenerations] = useState(1); // Default is now 1
+  const [remainingGenerations, setRemainingGenerations] = useState(1); 
+  const [totalGenerations, setTotalGenerations] = useState(1);
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
@@ -54,10 +55,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     } else {
+      // Anonymous user logic
       setIsLoggedIn(false);
       setUsername(null);
-      setRemainingGenerations(1);
-      setTotalGenerations(1);
+      
+      // Get anonymous quota
+      const anonymousQuota = getAnonymousQuota();
+      setRemainingGenerations(anonymousQuota);
+      setTotalGenerations(1); // Anonymous users always have max 1 generation
       setInstagramConnected(false);
     }
   };
@@ -100,15 +105,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     
     setIsLoggedIn(false);
     setUsername(null);
-    setRemainingGenerations(3);
-    setTotalGenerations(3);
+    
+    // Reset to anonymous user status with 1 generation
+    localStorage.setItem("anonymous_generations_remaining", "1");
+    setRemainingGenerations(1);
+    setTotalGenerations(1);
     setInstagramConnected(false);
   };
 
   const decrementGenerations = () => {
-    const newValue = remainingGenerations - 1;
-    setRemainingGenerations(newValue);
-    localStorage.setItem("remaining_generations", newValue.toString());
+    if (isLoggedIn) {
+      const newValue = remainingGenerations - 1;
+      setRemainingGenerations(newValue);
+      localStorage.setItem("remaining_generations", newValue.toString());
+    } else {
+      // For anonymous users, update anonymous quota
+      const newValue = Math.max(0, getAnonymousQuota() - 1);
+      localStorage.setItem("anonymous_generations_remaining", newValue.toString());
+      setRemainingGenerations(newValue);
+    }
   };
 
   const increaseGenerationsForFollow = () => {
@@ -136,4 +151,3 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     </UserContext.Provider>
   );
 };
-

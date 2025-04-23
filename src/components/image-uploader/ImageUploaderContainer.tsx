@@ -8,6 +8,7 @@ import ProcessingAnimation from "../ProcessingAnimation";
 import ResultDisplay from "../ResultDisplay";
 import LimitReachedModal from "../LimitReachedModal";
 import { API, encodeImageToBase64 } from "@/services/api";
+import { decrementAnonymousQuota } from "@/hooks/useAnonymousId";
 
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export default function ImageUploaderContainer() {
   const [showLimitModal, setShowLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollInterval = useRef<NodeJS.Timeout | null>(null);
-  const { remainingGenerations, decrementGenerations } = useUser();
+  const { remainingGenerations, decrementGenerations, isLoggedIn } = useUser();
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,6 +84,9 @@ export default function ImageUploaderContainer() {
       const response = await API.processImage(base64Data);
       setJobId(response.job_id);
       
+      // Decrement the generation count based on user type
+      decrementGenerations();
+      
       // Start polling for job status
       pollInterval.current = setInterval(async () => {
         try {
@@ -100,7 +104,6 @@ export default function ImageUploaderContainer() {
               setImageUrl(statusResponse.image_url);
             }
             setIsProcessing(false);
-            decrementGenerations();
             
             // Clear interval
             if (pollInterval.current) {

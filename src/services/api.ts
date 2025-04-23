@@ -1,10 +1,13 @@
+
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
+import { getAnonymousId, clearAnonymousData } from "@/hooks/useAnonymousId";
 
 interface ProcessImageRequest {
   workflow_name: string;
   image: string; // base64 encoded
   waitForResponse?: boolean;
+  anonymous_user_id?: string;
 }
 
 interface JobStatusResponse {
@@ -78,12 +81,19 @@ export const API = {
               return;
             }
             
-            // Call the login endpoint with the auth code
-            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/instagram-login?code=${code}`, {
+            // Get anonymous ID if it exists
+            const anonymousId = getAnonymousId();
+            
+            // Call the login endpoint with the auth code and anonymous ID
+            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/instagram-login`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
-              }
+              },
+              body: JSON.stringify({
+                code: code,
+                anonymous_user_id: anonymousId
+              })
             });
             
             if (!loginResponse.ok) {
@@ -92,6 +102,10 @@ export const API = {
             }
             
             const userData = await loginResponse.json();
+            
+            // Clear anonymous data after successful login
+            clearAnonymousData();
+            
             resolve({
               success: true,
               token: userData.access_token,
@@ -221,16 +235,23 @@ export const API = {
               return;
             }
 
+            // Get anonymous ID if it exists
+            const anonymousId = getAnonymousId();
+
             // Log the code we're sending to the backend
-            console.log('Sending code to backend:', { code });
+            console.log('Sending code to backend:', { code, anonymousId });
 
             const loginResponse = await fetch(
-              `${API_BASE_URL}/api/auth/facebook-login?code=${code}`,
+              `${API_BASE_URL}/api/auth/facebook-login`,
               {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({ 
+                  code: code,
+                  anonymous_user_id: anonymousId
+                })
               }
             );
 
@@ -242,6 +263,9 @@ export const API = {
 
             const userData = await loginResponse.json();
             console.log('Backend login success:', userData);
+            
+            // Clear anonymous data after successful login
+            clearAnonymousData();
             
             // Store auth token in localStorage
             if (userData.access_token) {
@@ -314,6 +338,7 @@ export const API = {
   
   processImage: async (image: string): Promise<JobStatusResponse> => {
     try {
+      // Prepare the request data
       const data: ProcessImageRequest = {
         workflow_name: "lastnurses_api", // Using the correct workflow name
         image: `data:image/jpeg;base64,${image}`, // Prepend the required prefix
@@ -328,6 +353,10 @@ export const API = {
       // Add auth token if available
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        // For anonymous users, include the anonymous ID
+        const anonymousId = getAnonymousId();
+        data.anonymous_user_id = anonymousId;
       }
       
       // Make the actual API call to the backend
