@@ -1,10 +1,10 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface GalleryImage {
   filename: string;
@@ -102,11 +102,18 @@ export default function Gallery() {
                 {gallery.map((item) => (
                   <div key={item.id} className="glass rounded-lg overflow-hidden transition-transform hover:scale-105">
                     <div className="relative">
-                      <img 
-                        src={item.processed_url || ''} 
-                        alt="Transformed image" 
-                        className="w-full h-auto object-contain"
-                      />
+                      {item.processed_url ? (
+                        <img 
+                          src={item.processed_url} 
+                          alt="Transformed image"
+                          className="w-full h-auto object-contain"
+                        />
+                      ) : (
+                        <div className="aspect-square w-full bg-apocalypse-darkgray flex items-center justify-center">
+                          <ImageOff className="text-white/30" size={48} />
+                          <span className="text-white/50 ml-2">Image Unavailable</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="p-4">
@@ -114,9 +121,9 @@ export default function Gallery() {
                         <span className="text-white/60 text-sm">
                           {formatDate(item.created_at)}
                         </span>
-                        <button className="text-xs px-2 py-1 bg-apocalypse-darkgray/80 hover:bg-apocalypse-darkgray text-white/80 hover:text-white rounded transition-colors">
-                          View
-                        </button>
+                        <span className="text-xs px-2 py-1 bg-apocalypse-darkgray/80 text-white/80 rounded">
+                          {item.workflow_id}
+                        </span>
                       </div>
                     </div>
                   </div>
