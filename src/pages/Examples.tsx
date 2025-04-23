@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Mock examples data
 const examples = [
@@ -75,23 +76,29 @@ export default function Examples() {
                 
                 <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-4'}`}>
                   <div className="space-y-2">
-                    <div className="w-full rounded-md overflow-hidden">
-                      <img 
-                        src={example.original} 
-                        alt={`Original ${example.title}`}
-                        className="w-full h-auto object-contain"
-                      />
+                    <div className="w-full rounded-md overflow-hidden relative">
+                      <AspectRatio ratio={3/4} className="bg-black/20">
+                        <img 
+                          src={example.original} 
+                          alt={`Original ${example.title}`}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      </AspectRatio>
                     </div>
                     <p className="text-center text-white/70 text-sm">Before</p>
                   </div>
                   
                   <div className="space-y-2">
-                    <div className="w-full rounded-md overflow-hidden">
-                      <img 
-                        src={example.processed} 
-                        alt={`Transformed ${example.title}`}
-                        className="w-full h-auto object-contain"
-                      />
+                    <div className="w-full rounded-md overflow-hidden relative">
+                      <AspectRatio ratio={3/4} className="bg-black/20">
+                        <img 
+                          src={example.processed} 
+                          alt={`Transformed ${example.title}`}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      </AspectRatio>
                     </div>
                     <p className="text-center text-white/70 text-sm">After</p>
                   </div>
@@ -109,23 +116,29 @@ export default function Examples() {
                 
                 <div className={`${isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-8'}`}>
                   <div className="space-y-2 flex flex-col">
-                    <div className="w-full flex-grow rounded-md overflow-hidden flex items-center justify-center">
-                      <img 
-                        src={groupExample.original} 
-                        alt={`Original ${groupExample.title}`}
-                        className="w-full h-auto object-contain"
-                      />
+                    <div className="w-full flex-grow rounded-md overflow-hidden relative">
+                      <AspectRatio ratio={16/9} className="bg-black/20">
+                        <img 
+                          src={groupExample.original} 
+                          alt={`Original ${groupExample.title}`}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      </AspectRatio>
                     </div>
                     <p className="text-center text-white/70 text-sm pt-2">Before</p>
                   </div>
                   
                   <div className="space-y-2 flex flex-col">
-                    <div className="w-full flex-grow rounded-md overflow-hidden flex items-center justify-center">
-                      <img 
-                        src={groupExample.processed} 
-                        alt={`Transformed ${groupExample.title}`}
-                        className="w-full h-auto object-contain"
-                      />
+                    <div className="w-full flex-grow rounded-md overflow-hidden relative">
+                      <AspectRatio ratio={16/9} className="bg-black/20">
+                        <img 
+                          src={groupExample.processed} 
+                          alt={`Transformed ${groupExample.title}`}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      </AspectRatio>
                     </div>
                     <p className="text-center text-white/70 text-sm pt-2">After</p>
                   </div>
