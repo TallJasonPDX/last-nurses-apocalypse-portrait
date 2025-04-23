@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,10 +7,14 @@ import { API } from "@/services/api";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface GalleryImage {
+  filename: string;
+  workflow_id: string;
   id: string;
-  original: string;
-  processed: string;
-  date: Date;
+  user_id: string;
+  original_url: string;
+  processed_url: string | null;
+  created_at: string;
+  processed_at: string | null;
 }
 
 export default function Gallery() {
@@ -33,15 +36,7 @@ export default function Gallery() {
       setIsLoading(true);
       try {
         const images = await API.getUserImages();
-        
-        const galleryImages = images.map(img => ({
-          id: img.id || img._id,
-          original: img.original_url || img.originalUrl || img.original_image || img.originalImage,
-          processed: img.processed_url || img.processedUrl || img.processed_image || img.processedImage,
-          date: new Date(img.created_at || img.createdAt || Date.now())
-        }));
-        
-        setGallery(galleryImages);
+        setGallery(images);
       } catch (error) {
         console.error("Failed to fetch gallery:", error);
       } finally {
@@ -51,7 +46,6 @@ export default function Gallery() {
     
     fetchGallery();
     
-    // Also re-fetch gallery when authentication events happen
     const handleAuthChange = () => {
       fetchGallery();
     };
@@ -67,7 +61,8 @@ export default function Gallery() {
     API.connectFacebook();
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     const diffInHours = diffInMs / (1000 * 60 * 60);
@@ -108,7 +103,7 @@ export default function Gallery() {
                   <div key={item.id} className="glass rounded-lg overflow-hidden transition-transform hover:scale-105">
                     <div className="relative">
                       <img 
-                        src={item.processed} 
+                        src={item.processed_url || ''} 
                         alt="Transformed image" 
                         className="w-full h-auto object-contain"
                       />
@@ -117,7 +112,7 @@ export default function Gallery() {
                     <div className="p-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-white/60 text-sm">
-                          {formatDate(item.date)}
+                          {formatDate(item.created_at)}
                         </span>
                         <button className="text-xs px-2 py-1 bg-apocalypse-darkgray/80 hover:bg-apocalypse-darkgray text-white/80 hover:text-white rounded transition-colors">
                           View
