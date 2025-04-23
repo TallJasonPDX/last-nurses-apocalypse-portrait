@@ -166,10 +166,11 @@ export const API = {
       });
 
       if (!authUrlResponse.ok) {
+        const errorData = await authUrlResponse.json();
+        console.error('Facebook auth URL error:', errorData);
         throw new Error('Failed to get Facebook authorization URL');
       }
 
-      // The backend should return a JSON with the auth url (authorization_url, auth_url, or url)
       const responseData = await authUrlResponse.json();
       const facebookAuthUrl =
         responseData.authorization_url ||
@@ -180,7 +181,13 @@ export const API = {
         throw new Error('No authorization URL returned from server');
       }
 
-      // Open Facebook OAuth page in a popup window
+      // Log the initial authorization URL to see what redirect_uri is being used
+      console.log('Facebook Auth URL:', {
+        fullUrl: facebookAuthUrl,
+        parsed: new URL(facebookAuthUrl),
+        redirectUri: new URL(facebookAuthUrl).searchParams.get('redirect_uri')
+      });
+
       const width = 600;
       const height = 700;
       const left = window.innerWidth / 2 - width / 2;
@@ -191,19 +198,31 @@ export const API = {
         `width=${width},height=${height},top=${top},left=${left}`
       );
 
-      // Listen for the redirect back with code parameter
       const authPromise = new Promise((resolve, reject) => {
         const handleRedirect = async (redirectUrl: string) => {
           try {
+            // Log the full redirect URL from Facebook to see what we're getting back
+            console.log('Facebook Redirect URL:', {
+              fullUrl: redirectUrl,
+              parsed: new URL(redirectUrl),
+              code: new URL(redirectUrl).searchParams.get('code'),
+              state: new URL(redirectUrl).searchParams.get('state')
+            });
+
             const url = new URL(redirectUrl);
             const code = url.searchParams.get('code');
 
             if (!code) {
+              const error = url.searchParams.get('error');
+              const errorDescription = url.searchParams.get('error_description');
+              console.error('Facebook auth error:', { error, errorDescription });
               reject(new Error('No authorization code provided'));
               return;
             }
 
-            // Call backend to exchange code for a token
+            // Log the code we're sending to the backend
+            console.log('Sending code to backend:', { code });
+
             const loginResponse = await fetch(
               `${API_BASE_URL}/api/auth/facebook-login?code=${code}`,
               {
@@ -216,12 +235,16 @@ export const API = {
 
             if (!loginResponse.ok) {
               const errorData = await loginResponse.json();
+              console.error('Backend login error:', errorData);
               throw new Error(errorData.detail || 'Authentication failed');
             }
 
             const userData = await loginResponse.json();
+            console.log('Backend login success:', userData);
+            
             resolve(userData);
           } catch (error) {
+            console.error('Facebook login error:', error);
             reject(error);
           }
         };
@@ -274,7 +297,7 @@ export const API = {
 
     } catch (error) {
       console.error('Facebook authentication error:', error);
-      toast.error("Failed to connect with Facebook. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to connect with Facebook. Please try again.");
     }
   },
   
