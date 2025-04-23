@@ -36,8 +36,8 @@ export default function Gallery() {
         
         const galleryImages = images.map(img => ({
           id: img.id || img._id,
-          original: img.original_image || img.originalImage || img.original_url || img.originalUrl,
-          processed: img.processed_image || img.processedImage || img.processed_url || img.processedUrl,
+          original: img.original_url || img.originalUrl || img.original_image || img.originalImage,
+          processed: img.processed_url || img.processedUrl || img.processed_image || img.processedImage,
           date: new Date(img.created_at || img.createdAt || Date.now())
         }));
         

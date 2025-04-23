@@ -386,7 +386,7 @@ export const API = {
     }
   },
   
-  // Add getUserImages endpoint to fetch user's generated images for the gallery
+  // Update endpoint to use the correct API path according to the API documentation
   getUserImages: async (): Promise<any[]> => {
     try {
       const token = localStorage.getItem("auth_token");
@@ -396,7 +396,8 @@ export const API = {
         return [];
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/images/user-images`, {
+      // Updated endpoint from /api/images/user-images to /api/user/history
+      const response = await fetch(`${API_BASE_URL}/api/user/history`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -412,7 +413,8 @@ export const API = {
       const result = await response.json();
       console.log("User images fetched:", result);
       
-      return result.images || [];
+      // Return the array directly since the API returns an array of images
+      return result || [];
     } catch (error) {
       console.error("Error fetching user images:", error);
       toast.error("Failed to load your gallery. Please try again later.");
