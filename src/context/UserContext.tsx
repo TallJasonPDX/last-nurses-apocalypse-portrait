@@ -25,8 +25,8 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [remainingGenerations, setRemainingGenerations] = useState(1); // Default is now 1
-  const [totalGenerations, setTotalGenerations] = useState(1); // Default is now 1
+  const [remainingGenerations, setRemainingGenerations] = useState(1); // Default is 1 free generation for all users
+  const [totalGenerations, setTotalGenerations] = useState(1); // Default is 1 free generation
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
@@ -54,9 +54,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     } else {
+      // Even if not logged in, check if they've used their free generation
+      const guestGenerationUsed = localStorage.getItem("guest_generation_used") === "true";
       setIsLoggedIn(false);
       setUsername(null);
-      setRemainingGenerations(1);
+      setRemainingGenerations(guestGenerationUsed ? 0 : 1);
       setTotalGenerations(1);
       setInstagramConnected(false);
     }
@@ -98,17 +100,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("instagram_connected");
     localStorage.removeItem("facebook_connected");
     
+    // Don't reset the guest generation flag on logout
     setIsLoggedIn(false);
     setUsername(null);
-    setRemainingGenerations(3);
-    setTotalGenerations(3);
+    
+    // Check if they've already used their guest generation
+    const guestGenerationUsed = localStorage.getItem("guest_generation_used") === "true";
+    setRemainingGenerations(guestGenerationUsed ? 0 : 1);
+    setTotalGenerations(1);
     setInstagramConnected(false);
   };
 
   const decrementGenerations = () => {
-    const newValue = remainingGenerations - 1;
-    setRemainingGenerations(newValue);
-    localStorage.setItem("remaining_generations", newValue.toString());
+    if (!isLoggedIn) {
+      // For guest users, mark their free generation as used
+      localStorage.setItem("guest_generation_used", "true");
+      setRemainingGenerations(0);
+    } else {
+      // For logged in users, decrement as before
+      const newValue = remainingGenerations - 1;
+      setRemainingGenerations(newValue);
+      localStorage.setItem("remaining_generations", newValue.toString());
+    }
   };
 
   const increaseGenerationsForFollow = () => {
@@ -136,4 +149,3 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     </UserContext.Provider>
   );
 };
-
