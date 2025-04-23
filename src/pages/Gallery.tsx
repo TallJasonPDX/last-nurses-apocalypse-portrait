@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -120,9 +119,6 @@ export default function Gallery() {
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-white/60 text-sm">
                           {formatDate(item.created_at)}
-                        </span>
-                        <span className="text-xs px-2 py-1 bg-apocalypse-darkgray/80 text-white/80 rounded">
-                          {item.workflow_id}
                         </span>
                       </div>
                     </div>
