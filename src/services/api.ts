@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useUser } from "@/context/UserContext";
 
 interface ProcessImageRequest {
   workflow_name: string;
@@ -242,6 +243,25 @@ export const API = {
             const userData = await loginResponse.json();
             console.log('Backend login success:', userData);
             
+            // Store auth token in localStorage
+            if (userData.access_token) {
+              localStorage.setItem("auth_token", userData.access_token);
+              
+              // Set a default username if none is provided
+              const username = userData.username || `user${Math.floor(Math.random() * 1000)}`;
+              localStorage.setItem("username", username);
+              
+              // Set default credits
+              const credits = userData.credits || 5;
+              localStorage.setItem("remaining_generations", credits.toString());
+              localStorage.setItem("facebook_connected", "true");
+              
+              // Show success message
+              toast.success(`Connected as ${username}`);
+            } else {
+              throw new Error("No access token received from server");
+            }
+            
             resolve(userData);
           } catch (error) {
             console.error('Facebook login error:', error);
@@ -277,23 +297,14 @@ export const API = {
       // Wait for backend authentication
       const authResult: any = await authPromise;
 
-      // Store auth info in localStorage
-      if (authResult.access_token) {
-        localStorage.setItem("auth_token", authResult.access_token);
-      }
-      if (authResult.username) {
-        localStorage.setItem("username", authResult.username);
-      }
-      if (authResult.credits) {
-        localStorage.setItem("remaining_generations", authResult.credits.toString());
-      }
-
-      localStorage.setItem("facebook_connected", "true");
-
-      // Show success message
-      toast.success(`Connected as ${authResult.username || 'user'} (Facebook)`);
-      // Reload the page to update state/UI
-      window.location.reload();
+      // Instead of reloading the page, we'll dispatch a custom event that the UserContext can listen for
+      window.dispatchEvent(new CustomEvent('user-authenticated', {
+        detail: {
+          token: authResult.access_token,
+          username: authResult.username || localStorage.getItem("username"),
+          credits: authResult.credits || 5
+        }
+      }));
 
     } catch (error) {
       console.error('Facebook authentication error:', error);

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -35,8 +36,8 @@ export default function Gallery() {
         
         const galleryImages = images.map(img => ({
           id: img.id || img._id,
-          original: img.original_image || img.originalImage,
-          processed: img.processed_image || img.processedImage,
+          original: img.original_image || img.originalImage || img.original_url || img.originalUrl,
+          processed: img.processed_image || img.processedImage || img.processed_url || img.processedUrl,
           date: new Date(img.created_at || img.createdAt || Date.now())
         }));
         
@@ -49,6 +50,17 @@ export default function Gallery() {
     };
     
     fetchGallery();
+    
+    // Also re-fetch gallery when authentication events happen
+    const handleAuthChange = () => {
+      fetchGallery();
+    };
+    
+    window.addEventListener('user-authenticated', handleAuthChange);
+    return () => {
+      window.removeEventListener('user-authenticated', handleAuthChange);
+    };
+    
   }, [isLoggedIn]);
 
   const handleFacebookLogin = () => {

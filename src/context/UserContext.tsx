@@ -30,11 +30,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
 
-  useEffect(() => {
+  // Function to refresh user state from localStorage
+  const refreshUserState = () => {
     const storedToken = localStorage.getItem("auth_token");
     const storedUsername = localStorage.getItem("username");
     const storedGenerations = localStorage.getItem("remaining_generations");
     const storedInstagramConnected = localStorage.getItem("instagram_connected");
+    const storedFacebookConnected = localStorage.getItem("facebook_connected");
     
     if (storedToken) {
       setIsLoggedIn(true);
@@ -45,13 +47,37 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const generations = parseInt(storedGenerations, 10);
         setRemainingGenerations(generations);
         
-        if (storedInstagramConnected === "true") {
+        if (storedInstagramConnected === "true" || storedFacebookConnected === "true") {
           setTotalGenerations(10);
         } else {
           setTotalGenerations(3);
         }
       }
+    } else {
+      setIsLoggedIn(false);
+      setUsername(null);
+      setRemainingGenerations(1);
+      setTotalGenerations(1);
+      setInstagramConnected(false);
     }
+  };
+
+  useEffect(() => {
+    // Initial user state setup
+    refreshUserState();
+    
+    // Set up event listener for authentication events
+    const handleAuthentication = () => {
+      console.log("Authentication event detected, refreshing user state");
+      refreshUserState();
+    };
+    
+    window.addEventListener('user-authenticated', handleAuthentication);
+    
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener('user-authenticated', handleAuthentication);
+    };
   }, []);
 
   const login = (token: string) => {
@@ -70,6 +96,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("username");
     localStorage.removeItem("remaining_generations");
     localStorage.removeItem("instagram_connected");
+    localStorage.removeItem("facebook_connected");
     
     setIsLoggedIn(false);
     setUsername(null);
@@ -110,4 +137,3 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// The duplicate export was here - removed to fix the error
