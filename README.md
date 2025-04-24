@@ -1,69 +1,95 @@
-# Welcome to your Lovable project
 
-## Project info
+# NurseFilter API
 
-**URL**: https://lovable.dev/projects/25c10ef8-f354-441e-980b-4c32178c3488
+A FastAPI backend service that processes images through RunPod with different nurse-themed LoRAs for specialized filter effects.
 
-## How can I edit this code?
+## 📋 Features
 
-There are several ways of editing your application.
+- **Asynchronous Image Processing**: Transform images using RunPod endpoints
+- **Facebook Authentication**: User authentication through Facebook OAuth
+- **Object Storage Integration**: Persistent storage for input and output images
+- **User Management**: User accounts with quota system
+- **Theme Management**: Multiple nurse-themed styles to choose from
+- **Job Status Tracking**: Monitor processing status with polling support
+- **Webhook Integration**: RunPod webhook support for processing status updates
 
-**Use Lovable**
+## 🏗️ Project Structure
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/25c10ef8-f354-441e-980b-4c32178c3488) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+├── app/                      # Application code
+│   ├── repository/          # Database operations
+│   ├── routers/            # API route definitions
+│   ├── services/           # Business logic services
+│   │   ├── runpod.py      # RunPod integration service
+│   │   └── job_tracker.py # Job status tracking service
+│   ├── utils/             # Utility functions
+│   │   └── storage.py     # Object storage operations
+│   ├── config.py          # Configuration settings
+│   ├── database.py        # Database models and setup
+│   ├── dependencies.py    # FastAPI dependencies
+│   ├── models.py         # Pydantic models
+│   └── security.py       # Authentication logic
+├── scripts/               # Utility scripts
+├── static/               # Static files
+│   ├── uploads/          # Original uploaded images
+│   ├── processed/        # Processed output images
+│   └── theme_previews/   # Theme preview images
+├── main.py              # Application entry point
+└── requirements.txt     # Python dependencies
 ```
 
-**Edit a file directly in GitHub**
+## 🔑 API Endpoints
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Image Processing
 
-**Use GitHub Codespaces**
+- `POST /api/images/process-image`
+  ```json
+  {
+    "workflow_name": "string",
+    "image": "base64_string",
+    "waitForResponse": boolean,
+    "anonymous_user_id": "string"
+  }
+  ```
+  Returns:
+  ```json
+  {
+    "job_id": "string",
+    "status": "string",
+    "output_image": "string",
+    "message": "string"
+  }
+  ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `GET /api/images/job-status/{job_id}`
+  Returns job status and result information
 
-## What technologies are used for this project?
+### User Management
+- `GET /api/user/profile` - Get user profile and quota
+- `GET /api/user/history` - Get user's processed image history
+- `GET /api/user/me` - Get current user information
 
-This project is built with .
+### Social Login (Facebook)
+- `GET /api/auth/facebook/authorize` - Get Facebook authorization URL
+- `POST /api/auth/facebook-login` - Handle Facebook OAuth callback
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The Facebook login flow works as follows:
+1. Frontend redirects to `/api/auth/facebook/authorize`
+2. Backend returns Facebook OAuth URL
+3. User logs into Facebook and approves permissions
+4. Facebook redirects back with auth code
+5. Frontend sends code to `/api/auth/facebook-login`
+6. Backend validates code, creates/updates user, and returns JWT token
 
-## How can I deploy this project?
+## 🚀 Development
 
-Simply open [Lovable](https://lovable.dev/projects/25c10ef8-f354-441e-980b-4c32178c3488) and click on Share -> Publish.
+Start the development server:
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-## I want to use a custom domain - is that possible?
+Access OpenAPI documentation at: `/docs` or `/redoc`
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 📄 License
+
+[MIT License](LICENSE)
