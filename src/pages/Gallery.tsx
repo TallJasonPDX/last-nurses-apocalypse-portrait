@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, parseISO } from "date-fns";
 import ResultDisplay from "@/components/ResultDisplay";
 
 interface GalleryImage {
@@ -66,12 +67,14 @@ export default function Gallery() {
 
   const formatDate = (dateString: string) => {
     try {
-      const date = new Date(dateString);
+      // Parse the ISO string to ensure we have a proper Date object
+      const date = parseISO(dateString);
       
       if (isNaN(date.getTime())) {
         return "Invalid date";
       }
       
+      // The parsed date is already in local timezone, so formatDistanceToNow will work correctly
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
       console.error("Error formatting date:", error);
