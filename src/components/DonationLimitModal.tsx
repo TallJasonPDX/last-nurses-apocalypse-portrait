@@ -1,5 +1,5 @@
 
-import { X, Venmo } from "lucide-react";
+import { X, DollarSign } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 interface DonationLimitModalProps {
@@ -42,7 +42,7 @@ export default function DonationLimitModal({ onClose }: DonationLimitModalProps)
             onClick={handleDonation}
             className="block w-full px-4 py-3 bg-[#3D95CE]/80 hover:bg-[#3D95CE] text-white rounded-md transition-transform hover:scale-105 mb-3 flex items-center justify-center space-x-2"
           >
-            <Venmo size={20} />
+            <DollarSign size={20} />
             <span>YES - I would love to generate more images and am happy to make a donation</span>
           </button>
           
@@ -57,3 +57,4 @@ export default function DonationLimitModal({ onClose }: DonationLimitModalProps)
     </div>
   );
 }
+
