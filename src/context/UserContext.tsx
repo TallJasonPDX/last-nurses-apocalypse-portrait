@@ -1,6 +1,12 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { getAnonymousQuota } from "@/hooks/useAnonymousId";
+
+// Add type for the custom event
+interface UserAuthEventDetail {
+  token: string;
+  username: string;
+  credits: number;
+}
 
 type UserContextType = {
   isLoggedIn: boolean;
@@ -42,13 +48,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (storedToken) {
       setIsLoggedIn(true);
       setUsername(storedUsername);
-      setInstagramConnected(storedInstagramConnected === "true");
       
       if (storedGenerations) {
         const generations = parseInt(storedGenerations, 10);
         setRemainingGenerations(generations);
         
-        if (storedInstagramConnected === "true" || storedFacebookConnected === "true") {
+        if (storedFacebookConnected === "true") {
           setTotalGenerations(10);
         } else {
           setTotalGenerations(3);
@@ -62,7 +67,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       // Get anonymous quota
       const anonymousQuota = getAnonymousQuota();
       setRemainingGenerations(anonymousQuota);
-      setTotalGenerations(1); // Anonymous users always have max 1 generation
+      setTotalGenerations(1);
       setInstagramConnected(false);
     }
   };
@@ -72,16 +77,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     refreshUserState();
     
     // Set up event listener for authentication events
-    const handleAuthentication = () => {
-      console.log("Authentication event detected, refreshing user state");
+    const handleAuthentication = (event: CustomEvent<UserAuthEventDetail>) => {
+      console.log("UserContext: 'user-authenticated' event received", event.detail);
       refreshUserState();
     };
     
-    window.addEventListener('user-authenticated', handleAuthentication);
+    window.addEventListener('user-authenticated', handleAuthentication as EventListener);
     
     // Clean up event listener on unmount
     return () => {
-      window.removeEventListener('user-authenticated', handleAuthentication);
+      window.removeEventListener('user-authenticated', handleAuthentication as EventListener);
     };
   }, []);
 

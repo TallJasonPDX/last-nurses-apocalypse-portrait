@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 import { getAnonymousId, clearAnonymousData } from "@/hooks/useAnonymousId";
@@ -275,6 +274,14 @@ export const API = {
               const credits = userData.credits || 5;
               localStorage.setItem("remaining_generations", credits.toString());
               localStorage.setItem("facebook_connected", "true");
+
+              // Dispatch custom event with user data
+              const eventPayload = {
+                token: userData.access_token,
+                username: username,
+                credits: credits
+              };
+              window.dispatchEvent(new CustomEvent('user-authenticated', { detail: eventPayload }));
             } else {
               throw new Error("No access token received from server");
             }
@@ -312,11 +319,8 @@ export const API = {
       });
 
       // Wait for backend authentication
-      const authResult: any = await authPromise;
-
-      // After successful login, reload the page to update the UI state
-      window.location.reload();
-
+      await authPromise;
+      
     } catch (error) {
       console.error('Facebook authentication error:', error);
     }
