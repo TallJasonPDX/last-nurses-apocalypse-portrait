@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Download, Instagram, Twitter, Facebook } from "lucide-react";
 import { toast } from "sonner";
@@ -78,17 +77,9 @@ export default function ResultDisplay({
   };
 
   const handleInstagramShare = async () => {
-    const downloadSuccess = await handleDownload();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    if (!downloadSuccess) {
-      toast.error("Could not download image for sharing.");
-      return;
-    }
-
-    // Show modal with very high z-index to ensure visibility on mobile
-    setShowInstructionsModal(true);
-
-    if (navigator.share) {
+    if (isMobile && navigator.share) {
       try {
         const response = await fetch(processedImage);
         const blob = await response.blob();
@@ -100,16 +91,23 @@ export default function ResultDisplay({
           files: [file]
         });
 
-        console.log("Native share successful.");
+        toast.success("Opening share options...");
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          console.warn("Native share API failed:", error);
+          console.warn("Native share failed, falling back to download + modal:", error);
+          const downloadSuccess = await handleDownload();
+          if (downloadSuccess) {
+            setShowInstructionsModal(true);
+          }
         } else {
-          console.log("Native share cancelled by user.");
+          console.log("Share cancelled by user");
         }
       }
     } else {
-      console.log("Native Share API not supported, using modal instructions.");
+      const downloadSuccess = await handleDownload();
+      if (downloadSuccess) {
+        setShowInstructionsModal(true);
+      }
     }
   };
 
@@ -202,7 +200,6 @@ export default function ResultDisplay({
         </button>
       )}
       
-      {/* Modal with improved z-index for mobile */}
       {showInstructionsModal && (
         <InstagramInstructionsModal 
           onClose={() => setShowInstructionsModal(false)}
