@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 import { getAnonymousId, clearAnonymousData } from "@/hooks/useAnonymousId";
+import { isMobile } from 'react-device-detect';
 
 interface ProcessImageRequest {
   workflow_name: string;
@@ -167,6 +168,36 @@ export const API = {
     }
   },
   
+  completeFacebookLogin: async (code: string, anonymousId: string | null): Promise<AuthResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/facebook-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, anonymous_user_id: anonymousId }),
+      });
+
+      const userData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(userData.detail || `Facebook login completion failed (${response.status})`);
+      }
+
+      return {
+        success: true,
+        token: userData.access_token,
+        username: userData.username,
+        credits: userData.credits
+      };
+
+    } catch (error) {
+      console.error("Error completing Facebook login:", error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : String(error) 
+      };
+    }
+  },
+  
   connectFacebook: async (): Promise<void> => {
     try {
       // Get Facebook authorization URL from backend
@@ -191,147 +222,137 @@ export const API = {
         throw new Error('No authorization URL returned from server');
       }
 
-      // Log the initial authorization URL to see what redirect_uri is being used
-      console.log('Facebook Auth URL:', {
-        fullUrl: facebookAuthUrl,
-        parsed: new URL(facebookAuthUrl),
-        redirectUri: new URL(facebookAuthUrl).searchParams.get('redirect_uri')
-      });
-
-      const width = 600;
-      const height = 700;
-      const left = window.innerWidth / 2 - width / 2;
-      const top = window.innerHeight / 2 - height / 2;
-      const popup = window.open(
-        facebookAuthUrl,
-        'facebook-auth',
-        `width=${width},height=${height},top=${top},left=${left}`
-      );
-
-      const authPromise = new Promise((resolve, reject) => {
-        const handleRedirect = async (redirectUrl: string) => {
-          try {
-            // Log the full redirect URL from Facebook to see what we're getting back
-            console.log('Facebook Redirect URL:', {
-              fullUrl: redirectUrl,
-              parsed: new URL(redirectUrl),
-              code: new URL(redirectUrl).searchParams.get('code'),
-              state: new URL(redirectUrl).searchParams.get('state')
-            });
-
-            const url = new URL(redirectUrl);
-            const code = url.searchParams.get('code');
-
-            if (!code) {
-              const error = url.searchParams.get('error');
-              const errorDescription = url.searchParams.get('error_description');
-              console.error('Facebook auth error:', { error, errorDescription });
-              reject(new Error('No authorization code provided'));
-              return;
-            }
-
-            // Get anonymous ID if it exists
-            const anonymousId = getAnonymousId();
-
-            // Log the code we're sending to the backend
-            console.log('Sending code to backend:', { code, anonymousId });
-
-            const loginResponse = await fetch(
-              `${API_BASE_URL}/api/auth/facebook-login`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                  code: code,
-                  anonymous_user_id: anonymousId
-                })
-              }
-            );
-
-            if (!loginResponse.ok) {
-              const errorData = await loginResponse.json();
-              console.error('Backend login error:', errorData);
-              throw new Error(errorData.detail || 'Authentication failed');
-            }
-
-            const userData = await loginResponse.json();
-            console.log('Backend login success:', userData);
-            
-            // Clear anonymous data after successful login
-            clearAnonymousData();
-            
-            // Store auth token in localStorage
-            if (userData.access_token) {
-              localStorage.setItem("auth_token", userData.access_token);
-              
-              // Set a default username if none is provided
-              const username = userData.username || `user${Math.floor(Math.random() * 1000)}`;
-              localStorage.setItem("username", username);
-              
-              // Set default credits
-              const credits = userData.credits || 5;
-              localStorage.setItem("remaining_generations", credits.toString());
-              localStorage.setItem("facebook_connected", "true");
-
-              // Dispatch custom event with user data
-              const eventPayload = {
-                token: userData.access_token,
-                username: username,
-                credits: credits
-              };
-              window.dispatchEvent(new CustomEvent('user-authenticated', { detail: eventPayload }));
-            } else {
-              throw new Error("No access token received from server");
-            }
-            
-            resolve(userData);
-          } catch (error) {
-            console.error('Facebook login error:', error);
-            reject(error);
-          }
-        };
-
-        if (popup) {
-          const checkPopup = setInterval(() => {
-            try {
-              // Only proceed if redirected back to the same domain
-              if (popup.location.hostname === window.location.hostname) {
-                clearInterval(checkPopup);
-                handleRedirect(popup.location.href);
-                popup.close();
-              }
-            } catch (_) {
-              // Cross-origin, ignore until it returns to our domain
-            }
-          }, 500);
-
-          // Detect if popup closed before completion
-          const checkClosed = setInterval(() => {
-            if (popup.closed) {
-              clearInterval(checkClosed);
-              clearInterval(checkPopup);
-              reject(new Error('Authentication window was closed'));
-            }
-          }, 500);
-        }
-      });
-
-      // Wait for backend authentication
-      await authPromise;
+      const anonymousId = getAnonymousId();
       
+      if (isMobile) {
+        console.log("[Facebook Connect] Mobile detected, using full-page redirect.");
+        if (anonymousId) {
+          sessionStorage.setItem('anonymous_user_id_pending', anonymousId);
+        } else {
+          sessionStorage.removeItem('anonymous_user_id_pending');
+        }
+        window.location.href = facebookAuthUrl;
+      } else {
+        console.log("[Facebook Connect] Desktop detected, using popup.");
+        const width = 600;
+        const height = 700;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+        
+        const popup = window.open(
+          facebookAuthUrl,
+          'facebook-auth',
+          `width=${width},height=${height},top=${top},left=${left}`
+        );
+
+        const authPromise = new Promise<AuthResponse>((resolve, reject) => {
+          let loginProcessed = false;
+          
+          const handleRedirect = async (redirectUrl: string) => {
+            if (loginProcessed) return;
+            loginProcessed = true;
+            
+            try {
+              console.log("[Popup handleRedirect] URL:", redirectUrl);
+              const url = new URL(redirectUrl);
+              const code = url.searchParams.get('code');
+              
+              if (!code) {
+                const error = url.searchParams.get('error');
+                reject(new Error(error || 'No authorization code provided in popup redirect'));
+                return;
+              }
+              
+              const authResult = await API.completeFacebookLogin(code, anonymousId);
+              
+              if (authResult.success && authResult.token) {
+                localStorage.setItem("auth_token", authResult.token);
+                if (authResult.username) localStorage.setItem("username", authResult.username);
+                localStorage.setItem("remaining_generations", (authResult.credits ?? 5).toString());
+                localStorage.setItem("facebook_connected", "true");
+                
+                clearAnonymousData();
+                
+                const eventPayload = {
+                  token: authResult.token,
+                  username: authResult.username || `user${Math.floor(Math.random() * 1000)}`,
+                  credits: authResult.credits ?? 5
+                };
+                
+                window.dispatchEvent(new CustomEvent('user-authenticated', { detail: eventPayload }));
+                resolve(authResult);
+              } else {
+                throw new Error(authResult.error || 'Failed to complete Facebook login');
+              }
+            } catch (error) {
+              console.error("[Popup handleRedirect] Error:", error);
+              reject(error);
+            } finally {
+              if (popup && !popup.closed) popup.close();
+            }
+          };
+
+          if (popup) {
+            const checkPopup = setInterval(() => {
+              if (loginProcessed || popup.closed) {
+                clearInterval(checkPopup);
+                return;
+              }
+              
+              try {
+                if (popup.location.href.includes('/facebook-auth-callback')) {
+                  if (popup.location.search.includes('code=')) {
+                    console.log("[Popup Check] Detected callback URL with code.");
+                    clearInterval(checkPopup);
+                    handleRedirect(popup.location.href);
+                  } else if (popup.location.search.includes('error=')) {
+                    console.log("[Popup Check] Detected callback URL with error.");
+                    clearInterval(checkPopup);
+                    handleRedirect(popup.location.href);
+                  }
+                }
+              } catch (_) {
+                // Cross-origin error, ignore until redirect happens
+              }
+            }, 300);
+            
+            const checkClosed = setInterval(() => {
+              if (popup.closed) {
+                clearInterval(checkClosed);
+                if (!loginProcessed) {
+                  clearInterval(checkPopup);
+                  reject(new Error('Authentication window was closed'));
+                }
+              }
+            }, 500);
+          } else {
+            reject(new Error("Failed to open popup window."));
+          }
+        });
+        
+        try {
+          await authPromise;
+          console.log("[Facebook Connect] Desktop popup flow completed.");
+        } catch (error) {
+          if (error instanceof Error && error.message === 'Authentication window was closed') {
+            console.log("Authentication popup closed by user.");
+          } else {
+            console.error('[Facebook Connect] Desktop popup flow error:', error);
+            toast.error(error instanceof Error ? error.message : "Facebook connection failed.");
+          }
+        }
+      }
     } catch (error) {
       console.error('Facebook authentication error:', error);
+      toast.error(error instanceof Error ? error.message : "Could not connect to Facebook.");
     }
   },
   
   processImage: async (image: string): Promise<JobStatusResponse> => {
     try {
-      // Prepare the request data
       const data: ProcessImageRequest = {
-        workflow_name: "lastnurses_api", // Using the correct workflow name
-        image: `data:image/jpeg;base64,${image}`, // Prepend the required prefix
+        workflow_name: "lastnurses_api",
+        image: `data:image/jpeg;base64,${image}`,
         waitForResponse: false
       };
       
@@ -340,16 +361,13 @@ export const API = {
         'Content-Type': 'application/json'
       };
       
-      // Add auth token if available
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       } else {
-        // For anonymous users, include the anonymous ID
         const anonymousId = getAnonymousId();
         data.anonymous_user_id = anonymousId;
       }
       
-      // Make the actual API call to the backend
       const response = await fetch(`${API_BASE_URL}/api/images/process-image`, {
         method: 'POST',
         headers: headers,
@@ -378,7 +396,6 @@ export const API = {
         'Content-Type': 'application/json'
       };
       
-      // Add auth token if available
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -408,11 +425,9 @@ export const API = {
       const token = localStorage.getItem("auth_token");
       
       if (!token) {
-        // Return empty array if not authenticated
         return [];
       }
       
-      // Updated endpoint from /api/images/user-images to /api/user/history
       const response = await fetch(`${API_BASE_URL}/api/user/history`, {
         method: 'GET',
         headers: {
@@ -429,7 +444,6 @@ export const API = {
       const result = await response.json();
       console.log("User images fetched:", result);
       
-      // Return the array directly since the API returns an array of images
       return result || [];
     } catch (error) {
       console.error("Error fetching user images:", error);
@@ -444,7 +458,6 @@ export const encodeImageToBase64 = (file: File): Promise<string> => {
     reader.readAsDataURL(file);
     reader.onload = () => {
       if (typeof reader.result === 'string') {
-        // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
         const base64String = reader.result.split(',')[1];
         resolve(base64String);
       } else {

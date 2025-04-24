@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import DataRequests from "./pages/DataRequests";
+import FacebookCallback from "./pages/FacebookCallback";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/data-requests" element={<DataRequests />} />
+            <Route path="/facebook-auth-callback" element={<FacebookCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
