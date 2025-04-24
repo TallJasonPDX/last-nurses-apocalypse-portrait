@@ -1,5 +1,5 @@
 
-import { X, DollarSign } from "lucide-react";
+import { X, Send } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 interface DonationLimitModalProps {
@@ -38,17 +38,23 @@ export default function DonationLimitModal({ onClose }: DonationLimitModalProps)
             Your donation of $2 - $5 helps us run this project and build more fun nurse experiences.
           </p>
           
-          <button
-            onClick={handleDonation}
-            className="block w-full px-4 py-3 bg-[#3D95CE]/80 hover:bg-[#3D95CE] text-white rounded-md transition-transform hover:scale-105 mb-3 flex items-center justify-center space-x-2"
+          <a 
+            href="https://venmo.com/replace_rn" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={() => {
+              increaseGenerationsForDonation();
+              onClose();
+            }}
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#3D95CE]/80 hover:bg-[#3D95CE] text-white rounded-md transition-colors block w-full justify-center"
           >
-            <DollarSign size={20} />
+            <Send size={16} />
             <span>YES - I would love to generate more images and am happy to make a donation</span>
-          </button>
+          </a>
           
           <button
             onClick={onClose}
-            className="text-sm text-white/60 hover:text-white/80 transition-colors"
+            className="text-sm text-white/60 hover:text-white/80 transition-colors mt-3"
           >
             No Thanks - I understand but am not interested in donating at this time
           </button>
