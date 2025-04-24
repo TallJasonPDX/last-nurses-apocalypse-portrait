@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
-import { format, formatDistanceToNow, parseISO } from "date-fns";
+import { formatDistanceToNow, parseISO } from "date-fns";
 import ResultDisplay from "@/components/ResultDisplay";
 
 interface GalleryImage {
@@ -144,7 +144,7 @@ export default function Gallery() {
               </div>
             )
           ) : (
-            <div className="text-center py-12 glass rounded-lg">
+            <div className="text-center py-12 glass rounded-lg flex flex-col items-center">
               <h3 className="text-white text-xl mb-4">Sign In Required</h3>
               <p className="text-white/70 mb-6">
                 Please sign in with Facebook to view your personal gallery.
