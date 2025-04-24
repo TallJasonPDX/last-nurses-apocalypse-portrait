@@ -2,18 +2,24 @@
 import { X, Instagram } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
+import DonationLimitModal from "./DonationLimitModal";
 
 interface LimitReachedModalProps {
   onClose: () => void;
 }
 
 export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
-  const { increaseGenerationsForFollow } = useUser();
+  const { increaseGenerationsForFollow, hasUsedInstagramBonus, setHasUsedInstagramBonus } = useUser();
   const [hasFollowed, setHasFollowed] = useState(false);
+
+  if (hasUsedInstagramBonus) {
+    return <DonationLimitModal onClose={onClose} />;
+  }
 
   const handleInstagramFollow = () => {
     window.open("https://www.instagram.com/replace_rn/", "_blank");
     increaseGenerationsForFollow();
+    setHasUsedInstagramBonus(true);
     setHasFollowed(true);
   };
 

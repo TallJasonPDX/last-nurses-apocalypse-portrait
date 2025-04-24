@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { getAnonymousQuota } from "@/hooks/useAnonymousId";
 
-// Add type for the custom event
 interface UserAuthEventDetail {
   token: string;
   username: string;
@@ -14,10 +13,13 @@ type UserContextType = {
   totalGenerations: number;
   username: string | null;
   instagramConnected: boolean;
+  hasUsedInstagramBonus: boolean;
   login: (token: string) => void;
   logout: () => void;
   decrementGenerations: () => void;
   increaseGenerationsForFollow: () => void;
+  increaseGenerationsForDonation: () => void;
+  setHasUsedInstagramBonus: (value: boolean) => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -32,18 +34,17 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [remainingGenerations, setRemainingGenerations] = useState(1); 
+  const [remainingGenerations, setRemainingGenerations] = useState(1);
   const [totalGenerations, setTotalGenerations] = useState(1);
   const [username, setUsername] = useState<string | null>(null);
   const [instagramConnected, setInstagramConnected] = useState(false);
+  const [hasUsedInstagramBonus, setHasUsedInstagramBonus] = useState(false);
 
-  // Function to refresh user state from localStorage
   const refreshUserState = () => {
     const storedToken = localStorage.getItem("auth_token");
     const storedUsername = localStorage.getItem("username");
     const storedGenerations = localStorage.getItem("remaining_generations");
-    const storedInstagramConnected = localStorage.getItem("instagram_connected");
-    const storedFacebookConnected = localStorage.getItem("facebook_connected");
+    const storedInstagramBonus = localStorage.getItem("has_used_instagram_bonus");
     
     if (storedToken) {
       setIsLoggedIn(true);
@@ -53,30 +54,27 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const generations = parseInt(storedGenerations, 10);
         setRemainingGenerations(generations);
         
-        if (storedFacebookConnected === "true") {
-          setTotalGenerations(10);
+        if (storedInstagramBonus === "true") {
+          setHasUsedInstagramBonus(true);
         } else {
-          setTotalGenerations(3);
+          setHasUsedInstagramBonus(false);
         }
       }
     } else {
-      // Anonymous user logic
       setIsLoggedIn(false);
       setUsername(null);
       
-      // Get anonymous quota
       const anonymousQuota = getAnonymousQuota();
       setRemainingGenerations(anonymousQuota);
       setTotalGenerations(1);
       setInstagramConnected(false);
+      setHasUsedInstagramBonus(false);
     }
   };
 
   useEffect(() => {
-    // Initial user state setup
     refreshUserState();
     
-    // Set up event listener for authentication events
     const handleAuthentication = (event: CustomEvent<UserAuthEventDetail>) => {
       console.log("UserContext: 'user-authenticated' event received", event.detail);
       refreshUserState();
@@ -84,7 +82,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     
     window.addEventListener('user-authenticated', handleAuthentication as EventListener);
     
-    // Clean up event listener on unmount
     return () => {
       window.removeEventListener('user-authenticated', handleAuthentication as EventListener);
     };
@@ -111,7 +108,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(false);
     setUsername(null);
     
-    // Reset to anonymous user status with 1 generation
     localStorage.setItem("anonymous_generations_remaining", "1");
     setRemainingGenerations(1);
     setTotalGenerations(1);
@@ -124,7 +120,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setRemainingGenerations(newValue);
       localStorage.setItem("remaining_generations", newValue.toString());
     } else {
-      // For anonymous users, update anonymous quota
       const newValue = Math.max(0, getAnonymousQuota() - 1);
       localStorage.setItem("anonymous_generations_remaining", newValue.toString());
       setRemainingGenerations(newValue);
@@ -133,6 +128,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const increaseGenerationsForFollow = () => {
     const newValue = 11; // 1 initial + 10 for following
+    setRemainingGenerations(newValue);
+    setTotalGenerations(newValue);
+    localStorage.setItem("remaining_generations", newValue.toString());
+    localStorage.setItem("has_used_instagram_bonus", "true");
+    setHasUsedInstagramBonus(true);
+  };
+
+  const increaseGenerationsForDonation = () => {
+    const currentGenerations = remainingGenerations;
+    const newValue = currentGenerations + 20;
     setRemainingGenerations(newValue);
     setTotalGenerations(newValue);
     localStorage.setItem("remaining_generations", newValue.toString());
@@ -146,10 +151,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         totalGenerations,
         username,
         instagramConnected,
+        hasUsedInstagramBonus,
         login,
         logout,
         decrementGenerations,
         increaseGenerationsForFollow,
+        increaseGenerationsForDonation,
+        setHasUsedInstagramBonus,
       }}
     >
       {children}
