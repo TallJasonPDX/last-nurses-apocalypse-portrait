@@ -13,8 +13,14 @@ export const useHiddenImages = () => {
     return hiddenImages.includes(imageId);
   };
 
+  const unhideAllImages = () => {
+    localStorage.removeItem('hidden_images');
+  };
+
   return {
     hideImage,
     isImageHidden,
+    unhideAllImages,
   };
 };
+

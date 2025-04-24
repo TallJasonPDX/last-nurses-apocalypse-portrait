@@ -38,7 +38,7 @@ export default function Gallery() {
   const { isLoggedIn } = useUser();
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { hideImage, isImageHidden } = useHiddenImages();
+  const { hideImage, isImageHidden, unhideAllImages } = useHiddenImages();
   const [imageToHide, setImageToHide] = useState<string | null>(null);
 
   useEffect(() => {
@@ -177,6 +177,20 @@ export default function Gallery() {
                 <svg width="20" height="20" fill="currentColor" className="inline mr-2" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.733 0-1.325.592-1.325 1.326v21.348c0 .733.592 1.326 1.325 1.326h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24h-1.918c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.733 0 1.325-.593 1.325-1.326V1.326C24 .592 23.408 0 22.675 0"/></svg>
                 Connect Facebook
               </button>
+            </div>
+          )}
+          {isLoggedIn && filteredGallery.length !== gallery.length && (
+            <div className="mt-8 text-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  unhideAllImages();
+                  setGallery([...gallery]); // Force re-render
+                }}
+                className="text-white hover:text-white hover:bg-white/10"
+              >
+                Unhide all Hidden Images
+              </Button>
             </div>
           )}
         </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -83,10 +82,7 @@ export default function Header() {
             {isLoggedIn ? (
               <div className="flex items-center space-x-4">
                 <div className="text-xs text-white/70">
-                  <span className="block">Welcome, {username}</span>
-                  <span className="block">
-                    Credits: {remainingGenerations}/{totalGenerations}
-                  </span>
+                  {remainingGenerations} Credits Remaining
                 </div>
                 <button 
                   onClick={logout}
@@ -153,10 +149,7 @@ export default function Header() {
             {isLoggedIn ? (
               <div className="flex flex-col space-y-3">
                 <div className="text-xs text-white/70">
-                  <span className="block">Welcome, {username}</span>
-                  <span className="block">
-                    Credits: {remainingGenerations}/{totalGenerations}
-                  </span>
+                  {remainingGenerations} Credits Remaining
                 </div>
                 <button 
                   onClick={logout}
@@ -179,4 +172,3 @@ export default function Header() {
     </header>
   );
 }
-
