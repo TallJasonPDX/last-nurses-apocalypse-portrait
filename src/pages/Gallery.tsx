@@ -1,19 +1,21 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
 import { ImageOff } from "lucide-react";
 import { API } from "@/services/api";
+import { format, formatDistanceToNow } from "date-fns";
 
 interface GalleryImage {
-  filename: string;
-  workflow_id: string;
   id: string;
   user_id: string;
-  original_url: string;
-  processed_url: string | null;
+  workflow_id: string;
+  status: string;
+  input_image_url: string;
+  output_image_url: string | null;
   created_at: string;
-  processed_at: string | null;
+  completed_at: string | null;
 }
 
 export default function Gallery() {
@@ -61,20 +63,20 @@ export default function Gallery() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    const diffInHours = diffInMs / (1000 * 60 * 60);
-    
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
-    } else if (diffInHours < 24) {
-      const hours = Math.floor(diffInHours);
-      return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-    } else {
-      const days = Math.floor(diffInHours / 24);
-      return `${days} day${days !== 1 ? 's' : ''} ago`;
+    try {
+      // Parse the UTC date string to a Date object
+      const date = new Date(dateString);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return "Invalid date";
+      }
+      
+      // Use formatDistanceToNow to get a relative time string
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Unknown date";
     }
   };
 
@@ -101,11 +103,28 @@ export default function Gallery() {
                 {gallery.map((item) => (
                   <div key={item.id} className="glass rounded-lg overflow-hidden transition-transform hover:scale-105">
                     <div className="relative">
-                      {item.processed_url ? (
+                      {item.output_image_url ? (
                         <img 
-                          src={item.processed_url} 
+                          src={item.output_image_url} 
                           alt="Transformed image"
                           className="w-full h-auto object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = ""; // Clear the src to prevent further attempts
+                            target.parentElement!.innerHTML = `
+                              <div class="aspect-square w-full bg-apocalypse-darkgray flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" 
+                                     stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" 
+                                     stroke-linejoin="round" class="lucide lucide-image-off">
+                                  <line x1="2" y1="2" x2="22" y2="22"></line>
+                                  <path d="M10.41 10.41a2 2 0 1 1 3.18 3.18"></path>
+                                  <path d="M2.08 19h4.24c.96 0 1.82-.32 2.56-.88l10.4-10.4c.47-.47.72-1.1.72-1.76 0-1.36-1.12-2.48-2.48-2.48-.66 0-1.29.24-1.76.72l-10.4 10.4c-.56.74-.88 1.6-.88 2.56V19"></path>
+                                </svg>
+                                <span class="text-white/50 ml-2">Image Loading Failed</span>
+                              </div>
+                            `;
+                          }}
                         />
                       ) : (
                         <div className="aspect-square w-full bg-apocalypse-darkgray flex items-center justify-center">
