@@ -1,12 +1,23 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useUser } from "@/context/UserContext";
-import { ImageOff } from "lucide-react";
+import { ImageOff, EyeOff } from "lucide-react";
 import { API } from "@/services/api";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import ResultDisplay from "@/components/ResultDisplay";
+import { useHiddenImages } from "@/hooks/useHiddenImages";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface GalleryImage {
   id: string;
@@ -27,7 +38,9 @@ export default function Gallery() {
   const { isLoggedIn } = useUser();
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const { hideImage, isImageHidden } = useHiddenImages();
+  const [imageToHide, setImageToHide] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchGallery = async () => {
       if (!isLoggedIn) {
@@ -67,20 +80,20 @@ export default function Gallery() {
 
   const formatDate = (dateString: string) => {
     try {
-      // Parse the ISO string to ensure we have a proper Date object
       const date = parseISO(dateString);
       
       if (isNaN(date.getTime())) {
         return "Invalid date";
       }
       
-      // The parsed date is already in local timezone, so formatDistanceToNow will work correctly
       return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
       console.error("Error formatting date:", error);
       return "Unknown date";
     }
   };
+
+  const filteredGallery = gallery.filter(item => !isImageHidden(item.id));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -100,12 +113,20 @@ export default function Gallery() {
                 <div className="w-16 h-16 border-t-4 border-apocalypse-terminal border-solid rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-white/70">Loading your transformations...</p>
               </div>
-            ) : gallery.length > 0 ? (
+            ) : filteredGallery.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gallery.map((item) => (
-                  <div key={item.id} className="glass rounded-lg overflow-hidden">
+                {filteredGallery.map((item) => (
+                  <div key={item.id} className="glass rounded-lg overflow-hidden relative group">
                     {item.output_image_url && item.input_image_url ? (
                       <div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-black/70"
+                          onClick={() => setImageToHide(item.id)}
+                        >
+                          <EyeOff className="h-4 w-4 text-white" />
+                        </Button>
                         <ResultDisplay
                           originalImage={item.input_image_url}
                           processedImage={item.output_image_url}
@@ -161,6 +182,30 @@ export default function Gallery() {
         </div>
       </main>
       <Footer />
+
+      <AlertDialog open={!!imageToHide} onOpenChange={() => setImageToHide(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hide Image</AlertDialogTitle>
+            <AlertDialogDescription>
+              Do you want to permanently hide this image from your Gallery?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (imageToHide) {
+                  hideImage(imageToHide);
+                  setImageToHide(null);
+                }
+              }}
+            >
+              Hide Image
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
