@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Download, Instagram, Twitter, Facebook } from "lucide-react";
 import { toast } from "sonner";
@@ -84,6 +85,7 @@ export default function ResultDisplay({
       return;
     }
 
+    // Show modal with very high z-index to ensure visibility on mobile
     setShowInstructionsModal(true);
 
     if (navigator.share) {
@@ -200,6 +202,7 @@ export default function ResultDisplay({
         </button>
       )}
       
+      {/* Modal with improved z-index for mobile */}
       {showInstructionsModal && (
         <InstagramInstructionsModal 
           onClose={() => setShowInstructionsModal(false)}

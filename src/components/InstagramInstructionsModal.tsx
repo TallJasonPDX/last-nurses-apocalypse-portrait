@@ -7,8 +7,8 @@ interface InstructionModalProps {
 }
 
 export const InstagramInstructionsModal = ({ onClose, onOpenInstagram }: InstructionModalProps) => (
-  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-    <div className="glass rounded-lg max-w-md w-full p-6 animate-scale-in">
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
+    <div className="glass rounded-lg max-w-md w-full p-6 animate-scale-in relative">
       <h3 className="text-xl text-white mb-4">Share to Instagram</h3>
       <ol className="text-white/80 space-y-3 list-decimal list-inside mb-6">
         <li>The image has been saved to your device</li>
