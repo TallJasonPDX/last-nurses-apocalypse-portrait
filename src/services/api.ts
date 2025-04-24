@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 import { getAnonymousId, clearAnonymousData } from "@/hooks/useAnonymousId";
@@ -321,14 +320,8 @@ export const API = {
       // Wait for backend authentication
       const authResult: any = await authPromise;
 
-      // Instead of reloading the page, we'll dispatch a custom event that the UserContext can listen for
-      window.dispatchEvent(new CustomEvent('user-authenticated', {
-        detail: {
-          token: authResult.access_token,
-          username: authResult.username || localStorage.getItem("username"),
-          credits: authResult.credits || 5
-        }
-      }));
+      // After successful login, reload the page to update the UI state
+      window.location.reload();
 
     } catch (error) {
       console.error('Facebook authentication error:', error);
@@ -415,7 +408,6 @@ export const API = {
     }
   },
   
-  // Update endpoint to use the correct API path according to the API documentation
   getUserImages: async (): Promise<any[]> => {
     try {
       const token = localStorage.getItem("auth_token");
@@ -452,7 +444,6 @@ export const API = {
   }
 };
 
-// Function to encode file as base64
 export const encodeImageToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
