@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 import { getAnonymousId, clearAnonymousData } from "@/hooks/useAnonymousId";
@@ -159,15 +160,11 @@ export const API = {
       // Set Instagram connected flag
       localStorage.setItem("instagram_connected", "true");
       
-      // Show success message
-      toast.success(`Connected as ${authResult.username || 'user'}`);
-      
-      // Reload the page to update the UI state
+      // After successful login, reload the page to update the UI state
       window.location.reload();
       
     } catch (error) {
       console.error('Instagram authentication error:', error);
-      toast.error("Failed to connect with Instagram. Please try again.");
     }
   },
   
@@ -278,9 +275,6 @@ export const API = {
               const credits = userData.credits || 5;
               localStorage.setItem("remaining_generations", credits.toString());
               localStorage.setItem("facebook_connected", "true");
-              
-              // Show success message
-              toast.success(`Connected as ${username}`);
             } else {
               throw new Error("No access token received from server");
             }
@@ -325,7 +319,6 @@ export const API = {
 
     } catch (error) {
       console.error('Facebook authentication error:', error);
-      toast.error(error instanceof Error ? error.message : "Failed to connect with Facebook. Please try again.");
     }
   },
   
@@ -370,7 +363,6 @@ export const API = {
       return result;
     } catch (error) {
       console.error("Image processing error:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to process image. Please try again.");
       throw error;
     }
   },
@@ -403,7 +395,6 @@ export const API = {
       return result;
     } catch (error) {
       console.error("Error checking job status:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to check job status. Please try again.");
       throw error;
     }
   },
@@ -438,7 +429,6 @@ export const API = {
       return result || [];
     } catch (error) {
       console.error("Error fetching user images:", error);
-      toast.error("Failed to load your gallery. Please try again later.");
       return [];
     }
   }
