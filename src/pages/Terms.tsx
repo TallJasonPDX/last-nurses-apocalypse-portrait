@@ -26,7 +26,8 @@ export default function Terms() {
 
   <h2>User Content and Rights</h2>
   <p>By uploading images or other content, you grant Replace RN an unrestricted, royalty-free, perpetual, worldwide license to use, reproduce, adapt, and display the content and its transformed versions for marketing, promotional, and operational purposes. This includes use in advertising campaigns or marketing materials across any media platform.</p>
-
+  <h2><User Responsibility for Uploaded Content/h2>
+  <p>By uploading any image or content, you represent and warrant that you own all necessary rights to the content or have obtained all necessary permissions to use it in connection with this application. You acknowledge that Replace RN is not responsible for verifying ownership or permissions for uploaded content and is not liable for any claims, damages, or disputes arising from improper use of images or other content you provide.</p>
   <h2>Use of Data</h2>
   <p>We use your submitted data for purposes including but not limited to:</p>
   <ul>
