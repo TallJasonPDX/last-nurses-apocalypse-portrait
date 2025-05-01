@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { getAnonymousQuota } from "@/hooks/useAnonymousId";
 
@@ -127,7 +128,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const increaseGenerationsForFollow = () => {
-    const newValue = 11; // 1 initial + 10 for following
+    const newValue = 10; // Changed from 11 to 10 (no initial +1)
     setRemainingGenerations(newValue);
     setTotalGenerations(newValue);
     localStorage.setItem("remaining_generations", newValue.toString());
