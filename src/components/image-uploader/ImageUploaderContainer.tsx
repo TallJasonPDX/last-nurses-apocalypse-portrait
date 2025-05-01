@@ -9,6 +9,7 @@ import ResultDisplay from "../ResultDisplay";
 import LimitReachedModal from "../LimitReachedModal";
 import { API, encodeImageToBase64 } from "@/services/api";
 import { decrementAnonymousQuota } from "@/hooks/useAnonymousId";
+import imageCompression from "browser-image-compression";
 
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -22,7 +23,7 @@ export default function ImageUploaderContainer() {
   const { remainingGenerations, decrementGenerations, isLoggedIn } = useUser();
 
   // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
@@ -38,14 +39,35 @@ export default function ImageUploaderContainer() {
       return;
     }
     
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setSelectedImage(reader.result);
-        setProcessedImage(null);
+    try {
+      console.log('Compressing/Orienting image...');
+      
+      // Process the image with browser-image-compression to fix orientation
+      const options = {
+        maxSizeMB: 10, // Keep size limit
+        useWebWorker: true, // Better performance
+        exifOrientation: true // Fix orientation issues
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      console.log('Image processed by browser-image-compression');
+      
+      // Read the processed file as data URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setSelectedImage(reader.result);
+          setProcessedImage(null);
+        }
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (error) {
+      console.error("Image processing error:", error);
+      toast.error("Failed to prepare image for upload. Please try again.");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   // Clear selected image

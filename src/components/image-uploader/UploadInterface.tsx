@@ -1,5 +1,5 @@
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Upload, Image } from "lucide-react";
 
 interface UploadInterfaceProps {
@@ -8,15 +8,56 @@ interface UploadInterfaceProps {
 
 export default function UploadInterface({ onFileSelect }: UploadInterfaceProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
+  
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      
+      // Create a synthetic change event
+      const event = {
+        target: {
+          files: e.dataTransfer.files
+        }
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      
+      onFileSelect(event);
+    }
+  };
 
   return (
     <div 
-      className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-apocalypse-terminal/50"
+      className={`border-2 border-dashed ${isDragging ? 'border-apocalypse-terminal' : 'border-white/20'} rounded-lg p-6 text-center cursor-pointer transition-colors hover:border-apocalypse-terminal/50`}
       onClick={handleUploadClick}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       <input 
         type="file" 
