@@ -1,7 +1,7 @@
 
 import { X, Instagram, Check } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DonationLimitModal from "./DonationLimitModal";
 
 interface LimitReachedModalProps {
@@ -13,19 +13,7 @@ export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
   const [hasFollowed, setHasFollowed] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
 
-  useEffect(() => {
-    let timer: number;
-    if (showThankYou) {
-      timer = window.setTimeout(() => {
-        onClose();
-      }, 2000); // Show thank you for 2 seconds then close
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [showThankYou, onClose]);
-
-  if (hasUsedInstagramBonus) {
+  if (hasUsedInstagramBonus && !showThankYou) {
     return <DonationLimitModal onClose={onClose} />;
   }
 
@@ -57,6 +45,12 @@ export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
               <p className="text-white/80">
                 Your generation limit has been increased to 10 images.
               </p>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-apocalypse-terminal/80 hover:bg-apocalypse-terminal text-white rounded-md transition-colors"
+              >
+                Continue
+              </button>
             </div>
           ) : (
             <>
