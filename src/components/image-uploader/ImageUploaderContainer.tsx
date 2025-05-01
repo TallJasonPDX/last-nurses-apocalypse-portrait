@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
@@ -8,12 +9,11 @@ import ResultDisplay from "../ResultDisplay";
 import LimitReachedModal from "../LimitReachedModal";
 import { API, encodeImageToBase64 } from "@/services/api";
 import { decrementAnonymousQuota } from "@/hooks/useAnonymousId";
-import { fixImageOrientation } from "@/lib/utils";
 
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // New state for direct image URL
   const [isProcessing, setIsProcessing] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -22,7 +22,7 @@ export default function ImageUploaderContainer() {
   const { remainingGenerations, decrementGenerations, isLoggedIn } = useUser();
 
   // Handle file selection
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
@@ -38,43 +38,21 @@ export default function ImageUploaderContainer() {
       return;
     }
     
-    try {
-      // Show loading state or indicator
-      const tempReader = new FileReader();
-      tempReader.onload = () => {
-        // Set a temporary preview immediately while orientation fixing happens
-        if (typeof tempReader.result === "string") {
-          setSelectedImage(tempReader.result);
-        }
-      };
-      tempReader.readAsDataURL(file);
-      
-      // Apply EXIF orientation correction
-      const correctedImageDataUrl = await fixImageOrientation(file);
-      
-      // Update with the corrected image when ready
-      setSelectedImage(correctedImageDataUrl);
-      setProcessedImage(null);
-    } catch (error) {
-      console.error("Error fixing image orientation:", error);
-      
-      // Fall back to standard FileReader if orientation fixing fails
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setSelectedImage(reader.result);
-          setProcessedImage(null);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setSelectedImage(reader.result);
+        setProcessedImage(null);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   // Clear selected image
   const handleClearImage = () => {
     setSelectedImage(null);
     setProcessedImage(null);
-    setImageUrl(null);
+    setImageUrl(null); // Clear the image URL as well
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -121,6 +99,7 @@ export default function ImageUploaderContainer() {
           if ((statusResponse.status === "COMPLETED" || statusResponse.status === "completed") && statusResponse.output_image) {
             // Job is complete
             setProcessedImage(statusResponse.output_image);
+            // Store the direct image URL if available
             if (statusResponse.image_url) {
               setImageUrl(statusResponse.image_url);
             }
@@ -191,7 +170,7 @@ export default function ImageUploaderContainer() {
           <ResultDisplay 
             originalImage={selectedImage}
             processedImage={processedImage}
-            imageUrl={imageUrl || undefined}
+            imageUrl={imageUrl || undefined} // Pass the direct image URL
             onReset={handleClearImage}
           />
         ) : isProcessing ? (
