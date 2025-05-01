@@ -22,7 +22,7 @@ export default function UploadInterface({ onFileSelect }: UploadInterfaceProps) 
         type="file" 
         ref={fileInputRef}
         className="hidden" 
-        accept="image/*" 
+        accept="image/*,.heic" 
         onChange={onFileSelect}
       />
       
