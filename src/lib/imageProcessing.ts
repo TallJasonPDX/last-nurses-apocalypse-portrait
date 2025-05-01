@@ -3,8 +3,19 @@ import EXIF from 'exif-js';
 import { Buffer } from 'buffer';
 import { toast } from "sonner";
 
-// Import heic-convert with type assertions since it doesn't have proper TypeScript definitions
-const heicConvert = require('heic-convert');
+// Import heic-convert as a dynamic import since it doesn't have proper TypeScript definitions
+// and avoid using require() which doesn't work in the browser
+let heicConvert: any = null;
+
+// We'll dynamically import heic-convert when needed
+async function getHeicConvert() {
+  if (!heicConvert) {
+    // Use dynamic import instead of require
+    const module = await import('heic-convert');
+    heicConvert = module.default || module;
+  }
+  return heicConvert;
+}
 
 /**
  * Converts a HEIC file to JPEG format
@@ -21,8 +32,11 @@ export async function convertHeicToJpeg(file: File): Promise<File> {
     // Read the file as an ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
     
+    // Get heic-convert module
+    const convert = await getHeicConvert();
+    
     // Convert HEIC to JPEG
-    const jpegBuffer = await heicConvert({
+    const jpegBuffer = await convert({
       buffer: Buffer.from(arrayBuffer),
       format: 'JPEG',
       quality: 0.9
