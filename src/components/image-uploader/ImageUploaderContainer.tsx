@@ -9,14 +9,12 @@ import ResultDisplay from "../ResultDisplay";
 import LimitReachedModal from "../LimitReachedModal";
 import { API, encodeImageToBase64 } from "@/services/api";
 import { decrementAnonymousQuota } from "@/hooks/useAnonymousId";
-import { processImageFile } from "@/lib/imageProcessing";
 
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null); 
+  const [imageUrl, setImageUrl] = useState<string | null>(null); // New state for direct image URL
   const [isProcessing, setIsProcessing] = useState(false);
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,13 +22,12 @@ export default function ImageUploaderContainer() {
   const { remainingGenerations, decrementGenerations, isLoggedIn } = useUser();
 
   // Handle file selection
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
     // Validate file is an image
-    const isHeic = file.name.toLowerCase().endsWith('.heic');
-    if (!file.type.startsWith("image/") && !isHeic) {
+    if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
@@ -41,31 +38,21 @@ export default function ImageUploaderContainer() {
       return;
     }
     
-    try {
-      // Store the original file for later processing
-      setOriginalFile(file);
-      
-      // Read file for preview (without processing yet)
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setSelectedImage(reader.result);
-          setProcessedImage(null);
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error("Error reading file:", error);
-      toast.error("Failed to read selected image");
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setSelectedImage(reader.result);
+        setProcessedImage(null);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   // Clear selected image
   const handleClearImage = () => {
     setSelectedImage(null);
     setProcessedImage(null);
-    setImageUrl(null);
-    setOriginalFile(null);
+    setImageUrl(null); // Clear the image URL as well
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -79,7 +66,7 @@ export default function ImageUploaderContainer() {
 
   // Process the image
   const handleProcessImage = async () => {
-    if (!selectedImage || !originalFile) return;
+    if (!selectedImage) return;
     
     // Check if user has remaining generations
     if (remainingGenerations <= 0) {
@@ -90,11 +77,8 @@ export default function ImageUploaderContainer() {
     try {
       setIsProcessing(true);
       
-      // Process image - convert HEIC if needed and fix orientation
-      const processedDataUrl = await processImageFile(originalFile);
-      
       // Convert the data URL to base64
-      const base64Data = processedDataUrl.split(",")[1];
+      const base64Data = selectedImage.split(",")[1];
       
       // Send to API
       const response = await API.processImage(base64Data);
@@ -186,7 +170,7 @@ export default function ImageUploaderContainer() {
           <ResultDisplay 
             originalImage={selectedImage}
             processedImage={processedImage}
-            imageUrl={imageUrl || undefined}
+            imageUrl={imageUrl || undefined} // Pass the direct image URL
             onReset={handleClearImage}
           />
         ) : isProcessing ? (
@@ -218,7 +202,7 @@ export default function ImageUploaderContainer() {
         ref={fileInputRef}
         className="hidden"
         onChange={handleFileChange}
-        accept="image/*,.heic"
+        accept="image/*"
       />
     </div>
   );
