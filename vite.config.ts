@@ -18,15 +18,17 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "buffer": "buffer", // Ensure buffer is properly resolved
     },
   },
-  // Define global values for Buffer
+  // Define global values
   define: {
     global: 'globalThis',
+    'process.env': {},
   },
   // Optimize dependencies that might cause issues
   optimizeDeps: {
-    include: ['buffer', 'exif-js'],
+    include: ['buffer', 'exif-js', 'heic-convert'],
     esbuildOptions: {
       // Define global values during the build
       define: {
@@ -38,5 +40,13 @@ export default defineConfig(({ mode }) => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      // Make sure these packages are properly externalized
+      output: {
+        manualChunks: {
+          'heic-convert': ['heic-convert'],
+        }
+      }
+    }
   },
 }));

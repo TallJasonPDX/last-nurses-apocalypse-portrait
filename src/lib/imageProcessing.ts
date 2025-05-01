@@ -1,17 +1,27 @@
+
 import EXIF from 'exif-js';
 import { Buffer } from 'buffer';
 import { toast } from "sonner";
 
-// Import heic-convert as a dynamic import since it doesn't have proper TypeScript definitions
-// and avoid using require() which doesn't work in the browser
+// Define a variable to hold the heic-convert module when loaded
 let heicConvert: any = null;
 
-// We'll dynamically import heic-convert when needed
+/**
+ * Dynamically imports the heic-convert module
+ * @returns Promise resolving to the heic-convert module
+ */
 async function getHeicConvert() {
   if (!heicConvert) {
-    // Use dynamic import instead of require
-    const module = await import('heic-convert');
-    heicConvert = module.default || module;
+    try {
+      // Use dynamic import instead of require
+      const module = await import('heic-convert');
+      // Handle both default and named exports
+      heicConvert = module.default || module;
+      return heicConvert;
+    } catch (error) {
+      console.error('Failed to import heic-convert:', error);
+      throw new Error('Failed to load HEIC conversion module');
+    }
   }
   return heicConvert;
 }
@@ -23,48 +33,66 @@ async function getHeicConvert() {
  */
 function extractExifOrientation(file: File): Promise<number> {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      if (!e.target?.result) {
-        resolve(1); // Default orientation if we can't read the file
-        return;
-      }
+    try {
+      const reader = new FileReader();
       
-      try {
-        const img = new Image();
-        
-        img.onload = () => {
-          EXIF.getData(img as any, function() {
-            const orientation = EXIF.getTag(this, 'Orientation') || 1;
-            console.log('Extracted EXIF orientation:', orientation);
-            resolve(orientation);
-          });
-        };
-        
-        img.onerror = () => {
-          console.warn('Failed to load image for EXIF extraction');
-          resolve(1); // Default orientation on error
-        };
-        
-        // Set the image source
-        if (typeof e.target.result === 'string') {
-          img.src = e.target.result;
-        } else {
-          img.src = URL.createObjectURL(new Blob([e.target.result as ArrayBuffer]));
+      reader.onload = (e) => {
+        if (!e.target?.result) {
+          console.log('No result from file reader, using default orientation');
+          resolve(1); // Default orientation if we can't read the file
+          return;
         }
-      } catch (error) {
-        console.error('Error extracting EXIF orientation:', error);
+        
+        try {
+          const img = new Image();
+          
+          img.onload = () => {
+            try {
+              EXIF.getData(img as any, function() {
+                try {
+                  const orientation = EXIF.getTag(this, 'Orientation') || 1;
+                  console.log('Extracted EXIF orientation:', orientation);
+                  resolve(orientation);
+                } catch (exifError) {
+                  console.warn('Error getting EXIF tag:', exifError);
+                  resolve(1);
+                }
+              });
+            } catch (exifError) {
+              console.warn('Error in EXIF.getData:', exifError);
+              resolve(1);
+            }
+          };
+          
+          img.onerror = (error) => {
+            console.warn('Failed to load image for EXIF extraction:', error);
+            resolve(1); // Default orientation on error
+          };
+          
+          // Set the image source
+          if (typeof e.target.result === 'string') {
+            img.src = e.target.result;
+          } else {
+            const blob = new Blob([e.target.result as ArrayBuffer]);
+            img.src = URL.createObjectURL(blob);
+          }
+        } catch (imageError) {
+          console.error('Error creating image for EXIF extraction:', imageError);
+          resolve(1); // Default orientation on error
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error('Failed to read file for EXIF extraction:', error);
         resolve(1); // Default orientation on error
-      }
-    };
-    
-    reader.onerror = () => {
-      console.error('Failed to read file for EXIF extraction');
-      resolve(1); // Default orientation on error
-    };
-    
-    reader.readAsDataURL(file);
+      };
+      
+      // Try reading as DataURL first as it's more widely supported
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Exception in extractExifOrientation:', error);
+      resolve(1); // Default orientation on any error
+    }
   });
 }
 
@@ -80,11 +108,17 @@ export async function convertHeicToJpeg(file: File): Promise<File> {
       return file;
     }
 
+    console.log('Converting HEIC file:', file.name);
+    
     // Read the file as an ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
     
     // Get heic-convert module
     const convert = await getHeicConvert();
+    
+    if (!convert) {
+      throw new Error('HEIC conversion module not available');
+    }
     
     // Convert HEIC to JPEG
     const jpegBuffer = await convert({
@@ -93,6 +127,8 @@ export async function convertHeicToJpeg(file: File): Promise<File> {
       quality: 0.9
     });
 
+    console.log('HEIC conversion successful');
+    
     // Create a new File with the converted JPEG
     return new File(
       [jpegBuffer], 
@@ -101,8 +137,8 @@ export async function convertHeicToJpeg(file: File): Promise<File> {
     );
   } catch (error) {
     console.error('Error converting HEIC to JPEG:', error);
-    toast.error('Failed to convert HEIC image. Please try another format.');
-    throw new Error('HEIC conversion failed');
+    toast.error('Failed to convert HEIC image. Please try another format or save as JPG/PNG first.');
+    throw new Error(`HEIC conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -129,10 +165,12 @@ export function fixImageOrientation(imageFile: File, orientationValue?: number):
           // If orientation was pre-extracted and provided, use it
           // Otherwise try to get it from EXIF data
           if (orientationValue) {
+            console.log('Using pre-extracted orientation:', orientationValue);
             applyOrientation(img, orientationValue, resolve);
           } else {
             EXIF.getData(img as any, function() {
               const orientation = EXIF.getTag(this, 'Orientation') || 1;
+              console.log('Extracted orientation during fix:', orientation);
               applyOrientation(img, orientation, resolve);
             });
           }
@@ -248,33 +286,53 @@ export async function processImageFile(file: File): Promise<string> {
     let orientationValue: number | undefined = undefined;
     
     if (isHeic) {
-      // For HEIC files, extract orientation BEFORE conversion
-      console.log('Processing HEIC file:', file.name);
-      orientationValue = await extractExifOrientation(file);
-      console.log('Extracted orientation before conversion:', orientationValue);
-      
-      // Then convert HEIC to JPEG
-      processedFile = await convertHeicToJpeg(file);
+      try {
+        // For HEIC files, extract orientation BEFORE conversion
+        console.log('Processing HEIC file:', file.name);
+        orientationValue = await extractExifOrientation(file);
+        console.log('Extracted orientation before conversion:', orientationValue);
+        
+        // Then convert HEIC to JPEG
+        processedFile = await convertHeicToJpeg(file);
+      } catch (heicError) {
+        console.error('HEIC handling failed, using original file:', heicError);
+        // Fall back to using original file with no orientation fix
+        return await fallbackToDataURL(file);
+      }
     }
     
-    // Finally fix the orientation - passing the pre-extracted orientation for HEIC files
-    // For non-HEIC files, orientation will be undefined and extracted in fixImageOrientation
-    return await fixImageOrientation(processedFile, isHeic ? orientationValue : undefined);
+    try {
+      // Finally fix the orientation - passing the pre-extracted orientation for HEIC files
+      // For non-HEIC files, orientation will be undefined and extracted in fixImageOrientation
+      return await fixImageOrientation(processedFile, isHeic ? orientationValue : undefined);
+    } catch (orientationError) {
+      console.error('Orientation fixing failed:', orientationError);
+      // If orientation fixing fails, return at least the converted file
+      return await fallbackToDataURL(processedFile);
+    }
   } catch (error) {
     console.error('Error processing image file:', error);
-    
-    // If processing fails, try to at least return the original file as a data URL
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (typeof e.target?.result === 'string') {
-          resolve(e.target.result);
-        } else {
-          reject(new Error('Failed to read original file'));
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read original file'));
-      reader.readAsDataURL(file);
-    });
+    // Last resort fallback to original file
+    return await fallbackToDataURL(file);
   }
+}
+
+/**
+ * Fallback function to convert a file to data URL without any processing
+ * @param file The file to convert
+ * @returns Promise with the file as a data URL
+ */
+async function fallbackToDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (typeof e.target?.result === 'string') {
+        resolve(e.target.result);
+      } else {
+        reject(new Error('Failed to read original file'));
+      }
+    };
+    reader.onerror = () => reject(new Error('Failed to read original file'));
+    reader.readAsDataURL(file);
+  });
 }
