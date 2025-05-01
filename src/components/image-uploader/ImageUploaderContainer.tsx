@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
@@ -9,6 +8,7 @@ import ResultDisplay from "../ResultDisplay";
 import LimitReachedModal from "../LimitReachedModal";
 import { API, encodeImageToBase64 } from "@/services/api";
 import { decrementAnonymousQuota } from "@/hooks/useAnonymousId";
+import { fixImageOrientation } from "@/lib/utils";
 
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export default function ImageUploaderContainer() {
   const { remainingGenerations, decrementGenerations, isLoggedIn } = useUser();
 
   // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
@@ -38,14 +38,24 @@ export default function ImageUploaderContainer() {
       return;
     }
     
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setSelectedImage(reader.result);
-        setProcessedImage(null);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Apply EXIF orientation correction
+      const correctedImageDataUrl = await fixImageOrientation(file);
+      setSelectedImage(correctedImageDataUrl);
+      setProcessedImage(null);
+    } catch (error) {
+      console.error("Error fixing image orientation:", error);
+      
+      // Fall back to standard FileReader if orientation fixing fails
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setSelectedImage(reader.result);
+          setProcessedImage(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Clear selected image
