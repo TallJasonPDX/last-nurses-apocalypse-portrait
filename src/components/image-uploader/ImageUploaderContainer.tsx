@@ -46,7 +46,7 @@ export default function ImageUploaderContainer() {
       const options = {
         maxSizeMB: 10, // Keep size limit
         useWebWorker: true, // Better performance
-        exifOrientation: true // Fix orientation issues
+        exifOrientation: -1 // Fix: Use -1 for auto-correction based on EXIF instead of boolean true
       };
       
       const compressedFile = await imageCompression(file, options);
