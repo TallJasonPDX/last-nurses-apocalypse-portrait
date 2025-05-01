@@ -15,14 +15,23 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
-    nodePolyfills(), // Add Node.js polyfills
+    nodePolyfills({
+      include: [
+        'node_modules/**/*.js',
+        new RegExp('node_modules/.vite/.*js')
+      ]
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "buffer": "buffer", // Ensure buffer is properly resolved
-      "util": "util", // Add util polyfill
-      "stream": "stream-browserify", // Add stream polyfill
+      "buffer": "buffer",
+      "util": "util",
+      "stream": "stream-browserify",
+      "process": "process/browser",
+      "zlib": "browserify-zlib",
+      "events": "events",
+      "assert": "assert",
     },
   },
   // Define global values
@@ -38,7 +47,13 @@ export default defineConfig(({ mode }) => ({
       'heic-convert', 
       'util', 
       'process', 
-      'stream-browserify'
+      'stream-browserify',
+      'events',
+      'assert',
+      'browserify-zlib',
+      'react',
+      'react-dom',
+      'react/jsx-runtime'
     ],
     esbuildOptions: {
       // Define global values during the build
@@ -52,13 +67,14 @@ export default defineConfig(({ mode }) => ({
       transformMixedEsModules: true,
     },
     rollupOptions: {
-      // Make sure these packages are properly externalized
       plugins: [
         nodePolyfills()
       ],
+      // Properly externalize packages that might cause issues
       output: {
         manualChunks: {
           'heic-convert': ['heic-convert'],
+          'react-vendor': ['react', 'react-dom', 'react/jsx-runtime'],
         }
       }
     }
