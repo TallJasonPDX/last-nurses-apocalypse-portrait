@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import type {
@@ -6,7 +5,7 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 5
+const TOAST_LIMIT = 0
 const TOAST_REMOVE_DELAY = 1000
 
 type ToasterToast = ToastProps & {
@@ -141,25 +140,16 @@ function dispatch(action: Action) {
 type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
+  // Create a no-op toast that doesn't actually display
   const id = genId()
-  
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-    },
-  })
-  
+  const update = (props: ToasterToast) => {}
+  const dismiss = () => {}
+
+  // Return the toast interface without actually adding it to the state
   return {
     id: id,
-    dismiss: () => dispatch({ type: "DISMISS_TOAST", toastId: id }),
-    update: (props: ToasterToast) =>
-      dispatch({
-        type: "UPDATE_TOAST",
-        toast: { ...props, id },
-      }),
+    dismiss,
+    update,
   }
 }
 
