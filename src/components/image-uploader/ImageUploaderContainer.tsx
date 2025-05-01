@@ -13,7 +13,7 @@ import { fixImageOrientation } from "@/lib/utils";
 export default function ImageUploaderContainer() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // New state for direct image URL
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -39,8 +39,20 @@ export default function ImageUploaderContainer() {
     }
     
     try {
+      // Show loading state or indicator
+      const tempReader = new FileReader();
+      tempReader.onload = () => {
+        // Set a temporary preview immediately while orientation fixing happens
+        if (typeof tempReader.result === "string") {
+          setSelectedImage(tempReader.result);
+        }
+      };
+      tempReader.readAsDataURL(file);
+      
       // Apply EXIF orientation correction
       const correctedImageDataUrl = await fixImageOrientation(file);
+      
+      // Update with the corrected image when ready
       setSelectedImage(correctedImageDataUrl);
       setProcessedImage(null);
     } catch (error) {
@@ -62,7 +74,7 @@ export default function ImageUploaderContainer() {
   const handleClearImage = () => {
     setSelectedImage(null);
     setProcessedImage(null);
-    setImageUrl(null); // Clear the image URL as well
+    setImageUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -109,7 +121,6 @@ export default function ImageUploaderContainer() {
           if ((statusResponse.status === "COMPLETED" || statusResponse.status === "completed") && statusResponse.output_image) {
             // Job is complete
             setProcessedImage(statusResponse.output_image);
-            // Store the direct image URL if available
             if (statusResponse.image_url) {
               setImageUrl(statusResponse.image_url);
             }
@@ -180,7 +191,7 @@ export default function ImageUploaderContainer() {
           <ResultDisplay 
             originalImage={selectedImage}
             processedImage={processedImage}
-            imageUrl={imageUrl || undefined} // Pass the direct image URL
+            imageUrl={imageUrl || undefined}
             onReset={handleClearImage}
           />
         ) : isProcessing ? (
