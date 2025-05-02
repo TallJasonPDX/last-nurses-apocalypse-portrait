@@ -1,8 +1,9 @@
 
-import { X, Instagram, Check } from "lucide-react";
+import { X, Instagram, Check, Heart } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 import DonationLimitModal from "./DonationLimitModal";
+import { Button } from "./ui/button";
 
 interface LimitReachedModalProps {
   onClose: () => void;
@@ -38,19 +39,24 @@ export default function LimitReachedModal({ onClose }: LimitReachedModalProps) {
         <div className="text-center">
           {showThankYou ? (
             <div className="flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
-                <Check size={32} className="text-green-500" />
+              <div className="w-20 h-20 bg-pink-500/10 rounded-full flex items-center justify-center mx-auto">
+                <Heart size={40} className="text-pink-500" />
               </div>
-              <h3 className="text-xl text-white">Thank you for following!</h3>
-              <p className="text-white/80">
-                Your generation limit has been increased to 10 images.
-              </p>
-              <button
+              <h3 className="text-2xl font-bold text-white">Thank you for following!</h3>
+              <div className="space-y-3 text-white/80">
+                <p>
+                  We trust that you've followed <span className="text-apocalypse-terminal font-medium">@replace_rn</span> on Instagram.
+                </p>
+                <p>
+                  Your generation limit has been increased to 10 images, and we look forward to sharing more nurse-themed content with you!
+                </p>
+              </div>
+              <Button 
                 onClick={onClose}
-                className="px-4 py-2 bg-apocalypse-terminal/80 hover:bg-apocalypse-terminal text-white rounded-md transition-colors"
+                className="mt-4 bg-apocalypse-terminal hover:bg-apocalypse-terminal/80 px-8 py-2"
               >
-                Continue
-              </button>
+                Continue Creating
+              </Button>
             </div>
           ) : (
             <>
